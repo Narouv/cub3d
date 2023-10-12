@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 00:58:05 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/12 18:28:55 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/12 18:32:58 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -274,7 +274,7 @@ void	cast_rays(t_mlxinfo *game)
 	player = &game->player;
 	ray = &game->ray;
 	int	*txt_arr[1];
-	txt_arr[0] = get_pixel_data("soup.png");
+	txt_arr[0] = get_pixel_data("./assets/soup.png");
 	while (x < WIDTH)
 	{
 		camera = 2 * x / (double)WIDTH - 1;
