@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+         #
+#    By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/19 17:59:41 by rnauke            #+#    #+#              #
-#    Updated: 2023/10/08 18:05:28 by rnauke           ###   ########.fr        #
+#    Updated: 2023/10/12 17:22:42 by rnauke           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ SOURCES_DIR = src
 
 user = "$USER"
 
-SOURCES = main.c line.c #map.c
+SOURCES = main.c #map.c
 OBJECTS = $(SOURCES:.c=.o)
 
 DIR_SRC = $(addprefix $(SOURCES_DIR)/, $(SOURCES))

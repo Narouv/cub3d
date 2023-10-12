@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 01:00:44 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/12 03:53:57 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/12 16:59:15 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@
 # include <fcntl.h>
 # define WIDTH 640
 # define HEIGHT 480
-# define TEX_WIDTH 256
-# define TEX_HEIGHT 256
+# define TEX_WIDTH 225
+# define TEX_HEIGHT 225
 
 typedef struct s_veci
 {
@@ -57,7 +57,8 @@ typedef struct s_map
 
 typedef struct s_texture
 {
-	t_veci	wall_pos;
+	int		x;
+	double	y;
 	double	tex_step;
 	int		wall_height;
 	int		color;
@@ -71,6 +72,7 @@ typedef struct s_ray
 	t_veci	map_pos;
 	t_veci	step_dir;
 	int		side;
+	double	length;
 	t_texture texture;
 }	t_ray;
 
