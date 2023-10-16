@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 00:58:05 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/16 18:14:10 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/16 21:25:32 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,9 @@ char	map[MAP_WIDTH][MAP_HEIGHT] = {
 
 void	init_player(t_player *player)
 {
+	// east = viewdir x: 0 y: 1, plane x: 0.66 y: 0
+	// south = viewdir x: 1 y: 0, plane x: 0 y: -0.66
+	// west = viewdir x: 0 y: -1, plane x: -0.66 y: 0
 	player->pos.x = 5;
 	player->pos.y = 5;
 	player->viewdir.x = -1;
@@ -167,9 +170,10 @@ void	update_ray(t_ray *ray, t_player *player, double camera)
 	ray->delta_dist.y = fabs(1 / ray->angle.y);
 	ray->map_pos.x = (int)player->pos.x;
 	ray->map_pos.y = (int)player->pos.y;
+	// printf("player view dir %f %f\nplayer cam plane %f %f\n", player->viewdir.x, player->viewdir.y, player->plane.x, player->plane.y);
 }
 
-void	draw_pixel_column(t_mlxinfo *game, int x, int *pixels)
+void	draw_pixel_column(t_mlxinfo *game, int x, t_texture *texture)
 {
 	int			y;
 	double		wall_hit;
@@ -180,11 +184,11 @@ void	draw_pixel_column(t_mlxinfo *game, int x, int *pixels)
 
 	ray = game->ray;
 	player = game->player;
-	ray.texture.wall_height = (int)(HEIGHT / game->ray.length);
-	start = (-ray.texture.wall_height / 2) + (HEIGHT / 2);
+	texture->wall_height = (int)(HEIGHT / game->ray.length);
+	start = (-texture->wall_height / 2) + (HEIGHT / 2);
 	if (start < 0)
 		start = 0;
-	end = (ray.texture.wall_height / 2) + (HEIGHT / 2);
+	end = (texture->wall_height / 2) + (HEIGHT / 2);
 	if (end >= HEIGHT)
 		end = HEIGHT - 1;
 	if (ray.side == 0)
@@ -193,18 +197,18 @@ void	draw_pixel_column(t_mlxinfo *game, int x, int *pixels)
 		wall_hit = player.pos.x + game->ray.length * ray.angle.x;
 	wall_hit -= floor((wall_hit));
 	//x coordinate on the texture
-	ray.texture.x = wall_hit * (double)TEX_WIDTH;
+	texture->x = wall_hit * (double)TEX_WIDTH;
 	if (ray.side == 0 && ray.angle.x > 0)
-		ray.texture.x = TEX_WIDTH - ray.texture.x - 1;
+		texture->x = TEX_WIDTH - texture->x - 1;
 	if (ray.side == 1 && ray.angle.y < 0)
-		ray.texture.x = TEX_WIDTH - ray.texture.x - 1;
+		texture->x = TEX_WIDTH - texture->x - 1;
 	// How much to increase the texture coordinate per screen pixel
-	ray.texture.tex_step = 1.0 * (double)TEX_HEIGHT / ray.texture.wall_height;
+	texture->tex_step = 1.0 * (double)TEX_HEIGHT / texture->wall_height;
 	// Starting texture coordinate
-	ray.texture.y
+	texture->y
 		= ((double)start - (double)HEIGHT
-			/ 2 + (double)ray.texture.wall_height / 2)
-		* ray.texture.tex_step;
+			/ 2 + (double)texture->wall_height / 2)
+		* texture->tex_step;
 	y = 0;
 	while (y < HEIGHT)
 	{
@@ -212,10 +216,10 @@ void	draw_pixel_column(t_mlxinfo *game, int x, int *pixels)
 			mlx_put_pixel(game->img, x, y, 0x520575FF);
 		else if (y >= start && y < end)
 		{
-			ray.texture.color
-				= pixels[(TEX_HEIGHT * ray.texture.x + (int)ray.texture.y)];
-			mlx_put_pixel(game->img, x, y, ray.texture.color);
-			ray.texture.y += ray.texture.tex_step;
+			texture->color
+				= texture->pixels[(TEX_HEIGHT * texture->x + (int)texture->y)];
+			mlx_put_pixel(game->img, x, y, texture->color);
+			texture->y += texture->tex_step;
 		}
 		else
 			mlx_put_pixel(game->img, x, y, 0x32a852FF);
@@ -232,7 +236,7 @@ int	get_texture_side(t_ray *ray)
 	if (ray->side == 1 && ray->step_dir.y < 0)
 		return (2);
 	if (ray->side == 1 && ray->step_dir.y > 0)
-		return (4);
+		return (3);
 	return (0);
 }
 
@@ -246,10 +250,6 @@ void	cast_rays(t_mlxinfo *game)
 	x = 0;
 	player = &game->player;
 	ray = &game->ray;
-	txt_arr[0] = get_pixel_data("./assets/cat.png");
-	txt_arr[1] = get_pixel_data("./assets/cat2.png");
-	txt_arr[2] = get_pixel_data("./assets/cat3.png");
-	txt_arr[3] = get_pixel_data("./assets/cat4.png");
 	while (x < WIDTH)
 	{
 		camera = 2 * x / (double)WIDTH - 1;
@@ -259,7 +259,7 @@ void	cast_rays(t_mlxinfo *game)
 		// dda
 		ray_length(ray);
 		// draw vertical line
-		draw_pixel_column(game, x, txt_arr[get_texture_side(ray) ? 2 : 3]);
+		draw_pixel_column(game, x, game->texture[get_texture_side(ray)]);
 		x++;
 	}
 }
@@ -308,8 +308,20 @@ void	ft_controls(void *g)
 		game->player.pos.x -= game->player.viewdir.x * move_speed;
 		game->player.pos.y -= game->player.viewdir.y * move_speed;
 	}
-	//rotate to the right
+	// move right
 	if (mlx_is_key_down(game->mlx, MLX_KEY_D))
+	{
+		game->player.pos.x += game->player.plane.x * move_speed;
+		game->player.pos.y += game->player.plane.y * move_speed;
+	}
+	// move left
+	if (mlx_is_key_down(game->mlx, MLX_KEY_A))
+	{
+		game->player.pos.x -= game->player.plane.x * move_speed;
+		game->player.pos.y -= game->player.plane.y * move_speed;
+	}
+	//rotate to the right
+	if (mlx_is_key_down(game->mlx, MLX_KEY_RIGHT))
 	{
 		double oldDirX = game->player.viewdir.x;
 		game->player.viewdir.x = game->player.viewdir.x * cos(-rot_speed) - game->player.viewdir.y * sin(-rot_speed);
@@ -319,7 +331,7 @@ void	ft_controls(void *g)
 		game->player.plane.y = oldPlaneX * sin(-rot_speed) + game->player.plane.y * cos(-rot_speed);
 	}
 	//rotate to the left
-	if (mlx_is_key_down(game->mlx, MLX_KEY_A))
+	if (mlx_is_key_down(game->mlx, MLX_KEY_LEFT))
 	{
 		double oldDirX = game->player.viewdir.x;
 		game->player.viewdir.x = game->player.viewdir.x * cos(rot_speed) - game->player.viewdir.y * sin(rot_speed);
@@ -332,6 +344,19 @@ void	ft_controls(void *g)
 		mlx_close_window(game->mlx);
 }
 
+void	init_textures(t_mlxinfo *game)
+{
+	game->texture = malloc(4 * sizeof(t_texture));
+	game->texture[0] = malloc(sizeof(t_texture));
+	game->texture[1] = malloc(sizeof(t_texture));
+	game->texture[2] = malloc(sizeof(t_texture));
+	game->texture[3] = malloc(sizeof(t_texture));
+	game->texture[0]->pixels = get_pixel_data("./assets/mc_cave.png"/*game->map.north*/);
+	game->texture[1]->pixels = get_pixel_data("./assets/mc_desert.png"/*game->map.south*/);
+	game->texture[2]->pixels = get_pixel_data("./assets/mc_house.png"/*game->map.east*/);
+	game->texture[3]->pixels = get_pixel_data("./assets/mc_nether.png"/*game->map.west*/);
+}
+
 int	main(void)
 {
 	t_mlxinfo	*game;
@@ -339,14 +364,16 @@ int	main(void)
 	
 	game = malloc(sizeof(t_mlxinfo));
 	init_game(game);
-	init_player(&game->player);
-	init_ray(&game->ray);
 	game->mlx = mlx_init(WIDTH, HEIGHT, "cub3d", true);
 	mlx = game->mlx;
 	game->img = mlx_new_image(mlx, WIDTH, HEIGHT);
+	init_player(&game->player);
+	init_ray(&game->ray);
+	init_textures(game);
 	mlx_image_to_window(mlx, game->img, 0, 0);
 	mlx_loop_hook(mlx, ft_controls, game);
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
+	system("leaks cub3d");
 	return (0);
 }

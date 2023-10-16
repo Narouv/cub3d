@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 01:00:44 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/16 18:14:40 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/16 20:17:48 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ typedef struct s_map
 
 typedef struct s_texture
 {
-	mlx_texture_t **txt_arr;
+	int		*pixels;
 	int		x;
 	double	y;
 	double	tex_step;
@@ -74,7 +74,6 @@ typedef struct s_ray
 	t_veci		step_dir;
 	int			side;
 	double		length;
-	t_texture	texture;
 }	t_ray;
 
 typedef struct s_mlxinfo
@@ -83,6 +82,7 @@ typedef struct s_mlxinfo
 	mlx_image_t *img;
 	t_player	player;
 	t_ray		ray;
+	t_texture	**texture;
 	// t_map		map;
 	double		time;
 	double		str_update_time;
