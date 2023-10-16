@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rhortens <rhortens@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 01:00:44 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/12 16:59:15 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/16 11:40:31 by rhortens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,15 @@ typedef struct s_map
 	mlx_texture_t	*east;
 	char			*floor;
 	char			*ceil;
+	int				width;
+	int				height;
+	char			**dir;
+	t_player		player;
+	int				line_count;
+	int				tex_count;
+	char			**tex;
+	int				f_col;
+	int				c_col;
 }	t_map;
 
 typedef struct s_texture
