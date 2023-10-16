@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 00:58:05 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/12 18:32:58 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/16 18:14:10 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,37 +40,6 @@ char	map[MAP_WIDTH][MAP_HEIGHT] = {
 { '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
 { '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1' }
 };
-
-void	put_square(mlx_image_t *img, int x, int y, int color)
-{
-	int scale = 10; // replace with some sort of scale in the struct
-	for (int xs = 0; xs < scale; xs++)
-		for (int ys = 0; ys < scale; ys++)
-			if (!xs || !ys)
-				mlx_put_pixel(img, x+xs, y+ys, 0x000000FF);
-			else if (xs == scale -1 || ys == scale -1)
-				mlx_put_pixel(img, x+xs, y+ys, 0x000000FF);
-			else
-				mlx_put_pixel(img, x+xs, y+ys, color);
-}
-
-void minimap(void *i/*char **map*/)
-{
-	mlx_image_t *img = i;
-	int scale = 10; // replace with some sort of scale in the struct
-	for (int y = 0; y < MAP_HEIGHT; y++)
-	{
-		for (int x = 0; x < MAP_WIDTH; x++)
-		{
-			if (map[y][x] == '1')
-				put_square(img, x*scale, y*scale, 0xFFFFFFFF);
-			else if (map[y][x] == '0')
-				put_square(img, x*scale, y*scale, 0xCCCCCCFF);
-			else
-				put_square(img, x*scale, y*scale, 0x0);
-		}	
-	}
-}
 
 void	init_player(t_player *player)
 {
@@ -116,7 +85,7 @@ int	*get_pixel_data(char *img_path)
 		exit(1);
 	p = t->bytes_per_pixel;
 	ty = 0;
-	txt_arr = malloc(sizeof(int) * TEX_WIDTH * TEX_WIDTH);
+	txt_arr = malloc(sizeof(int) * TEX_HEIGHT * TEX_WIDTH);
 	while (ty < TEX_WIDTH)
 	{
 		tx = 0;
@@ -204,8 +173,8 @@ void	draw_pixel_column(t_mlxinfo *game, int x, int *pixels)
 {
 	int			y;
 	double		wall_hit;
-	int			start;
-	int			end;
+	int			start; // remove
+	int			end; // remove
 	t_ray		ray;
 	t_player	player;
 
@@ -254,13 +223,17 @@ void	draw_pixel_column(t_mlxinfo *game, int x, int *pixels)
 	}
 }
 
-void	open_door(t_mlxinfo *game)
+int	get_texture_side(t_ray *ray)
 {
-	double	l;
-
-	l = game->ray.length;
-	if (mlx_is_mouse_down(game->mlx, MLX_MOUSE_BUTTON_LEFT) && l < 4)
-		map[game->ray.map_pos.x][game->ray.map_pos.y] = '0';
+	if (ray->side == 0 && ray->step_dir.x < 0)
+		return (0);
+	if (ray->side == 0 && ray->step_dir.x > 0)
+		return (1);
+	if (ray->side == 1 && ray->step_dir.y < 0)
+		return (2);
+	if (ray->side == 1 && ray->step_dir.y > 0)
+		return (4);
+	return (0);
 }
 
 void	cast_rays(t_mlxinfo *game)
@@ -273,8 +246,10 @@ void	cast_rays(t_mlxinfo *game)
 	x = 0;
 	player = &game->player;
 	ray = &game->ray;
-	int	*txt_arr[1];
-	txt_arr[0] = get_pixel_data("./assets/soup.png");
+	txt_arr[0] = get_pixel_data("./assets/cat.png");
+	txt_arr[1] = get_pixel_data("./assets/cat2.png");
+	txt_arr[2] = get_pixel_data("./assets/cat3.png");
+	txt_arr[3] = get_pixel_data("./assets/cat4.png");
 	while (x < WIDTH)
 	{
 		camera = 2 * x / (double)WIDTH - 1;
@@ -282,11 +257,9 @@ void	cast_rays(t_mlxinfo *game)
 		//decide ray step direction
 		ray_direction(ray, player);
 		// dda
-		ray_length(&game->ray);
+		ray_length(ray);
 		// draw vertical line
-		draw_pixel_column(game, x, txt_arr[0]);
-		if (x == WIDTH / 2)
-			open_door(game);
+		draw_pixel_column(game, x, txt_arr[get_texture_side(ray) ? 2 : 3]);
 		x++;
 	}
 }
@@ -338,34 +311,26 @@ void	ft_controls(void *g)
 	//rotate to the right
 	if (mlx_is_key_down(game->mlx, MLX_KEY_D))
 	{
-	  double oldDirX = game->player.viewdir.x;
-	  game->player.viewdir.x = game->player.viewdir.x * cos(-rot_speed) - game->player.viewdir.y * sin(-rot_speed);
-	  game->player.viewdir.y = oldDirX * sin(-rot_speed) + game->player.viewdir.y * cos(-rot_speed);
-	  double oldPlaneX = game->player.plane.x;
-	  game->player.plane.x = game->player.plane.x * cos(-rot_speed) - game->player.plane.y * sin(-rot_speed);
-	  game->player.plane.y = oldPlaneX * sin(-rot_speed) + game->player.plane.y * cos(-rot_speed);
+		double oldDirX = game->player.viewdir.x;
+		game->player.viewdir.x = game->player.viewdir.x * cos(-rot_speed) - game->player.viewdir.y * sin(-rot_speed);
+		game->player.viewdir.y = oldDirX * sin(-rot_speed) + game->player.viewdir.y * cos(-rot_speed);
+		double oldPlaneX = game->player.plane.x;
+		game->player.plane.x = game->player.plane.x * cos(-rot_speed) - game->player.plane.y * sin(-rot_speed);
+		game->player.plane.y = oldPlaneX * sin(-rot_speed) + game->player.plane.y * cos(-rot_speed);
 	}
 	//rotate to the left
 	if (mlx_is_key_down(game->mlx, MLX_KEY_A))
 	{
-	  double oldDirX = game->player.viewdir.x;
-	  game->player.viewdir.x = game->player.viewdir.x * cos(rot_speed) - game->player.viewdir.y * sin(rot_speed);
-	  game->player.viewdir.y = oldDirX * sin(rot_speed) + game->player.viewdir.y * cos(rot_speed);
-	  double oldPlaneX = game->player.plane.x;
-	  game->player.plane.x = game->player.plane.x * cos(rot_speed) - game->player.plane.y * sin(rot_speed);
-	  game->player.plane.y = oldPlaneX * sin(rot_speed) + game->player.plane.y * cos(rot_speed);
+		double oldDirX = game->player.viewdir.x;
+		game->player.viewdir.x = game->player.viewdir.x * cos(rot_speed) - game->player.viewdir.y * sin(rot_speed);
+		game->player.viewdir.y = oldDirX * sin(rot_speed) + game->player.viewdir.y * cos(rot_speed);
+		double oldPlaneX = game->player.plane.x;
+		game->player.plane.x = game->player.plane.x * cos(rot_speed) - game->player.plane.y * sin(rot_speed);
+		game->player.plane.y = oldPlaneX * sin(rot_speed) + game->player.plane.y * cos(rot_speed);
 	}
 	if (mlx_is_key_down(game->mlx, MLX_KEY_ESCAPE))
 		mlx_close_window(game->mlx);
 }
-
-// void	mouse_rot(void *p)
-// {
-// 	t_player *player;
-
-// 	player = &((t_mlxinfo *)p)->player;
-
-// }
 
 int	main(void)
 {
@@ -381,9 +346,7 @@ int	main(void)
 	game->img = mlx_new_image(mlx, WIDTH, HEIGHT);
 	mlx_image_to_window(mlx, game->img, 0, 0);
 	mlx_loop_hook(mlx, ft_controls, game);
-	// mlx_cursor_hook(mlx, mouse_rot, game);
-	// mlx_loop_hook(mlx, fps_cntr, game);
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
-	return (EXIT_SUCCESS);
+	return (0);
 }

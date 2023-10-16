@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cub3d.h                                            :+:      :+:    :+:   */
+/*   cub3d_bonus.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 01:00:44 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/16 18:14:40 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/15 18:38:41 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CUB3D_H
-# define CUB3D_H
+#ifndef CUB3D_BONUS_H
+# define CUB3D_BONUS_H
 
 # include "../MLX42/include/MLX42/MLX42.h"
 # include "../libft/libft.h"
@@ -22,8 +22,8 @@
 # include <fcntl.h>
 # define WIDTH 640
 # define HEIGHT 480
-# define TEX_WIDTH 256
-# define TEX_HEIGHT 256
+# define TEX_WIDTH 225
+# define TEX_HEIGHT 225
 
 typedef struct s_veci
 {
@@ -41,7 +41,7 @@ typedef struct s_player
 {
 	t_vec	pos;
 	t_vec	viewdir;
-	t_vec	plane;
+	t_vec	plane; //change name to something better cam_distance? cam_plane? fov?
 }	t_player;
 
 typedef struct s_map
@@ -57,7 +57,6 @@ typedef struct s_map
 
 typedef struct s_texture
 {
-	mlx_texture_t **txt_arr;
 	int		x;
 	double	y;
 	double	tex_step;
@@ -67,14 +66,15 @@ typedef struct s_texture
 
 typedef struct s_ray
 {
-	t_vec		angle;
-	t_vec		delta_dist;
-	t_vec		side_dist;
-	t_veci		map_pos;
-	t_veci		step_dir;
-	int			side;
-	double		length;
-	t_texture	texture;
+	t_vec	angle;
+	t_vec	delta_dist;
+	t_vec	side_dist;
+	t_veci	map_pos;
+	t_veci	step_dir;
+	int		side;
+	double	length;
+	int		door;
+	t_texture texture;
 }	t_ray;
 
 typedef struct s_mlxinfo
