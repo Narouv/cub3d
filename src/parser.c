@@ -6,11 +6,23 @@
 /*   By: rhortens <rhortens@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/13 13:15:57 by rhortens          #+#    #+#             */
-/*   Updated: 2023/10/16 11:41:20 by rhortens         ###   ########.fr       */
+/*   Updated: 2023/10/16 19:00:22 by rhortens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/cub3d.h"
+
+void	free_string(char **str)
+{
+	int	i;
+
+	i = 0;
+	if (!str)
+		return ;
+	while (str[i])
+		free(str[i++]);
+	free(str);
+}
 
 int	filename_error(char *file, char *c)
 {
@@ -51,7 +63,7 @@ int	file_check(char *file)
 {
 	if (filename_error(file, ".cub") < 0)
 		return (1);
-	if (!read_check(file));
+	if (!read_check(file))
 		return (1);
 	return (0);
 }
@@ -136,9 +148,11 @@ int	map_check(t_map *m)
 	{
 		while (j < m->width)
 		{
-			if (m->dir[i][j] != 'N' && m->dir[i][j] != 'E' && m->dir[i][j] != 'S' &&
-				m->dir[i][j] != 'W' && m->dir[i][j] != '0' && m->dir[i][j] != '1' && m->dir[i][j] != ' ')
-					return (1);
+			if (m->dir[i][j] != 'N' && m->dir[i][j] != 'E' &&
+				m->dir[i][j] != 'S' && m->dir[i][j] != 'W' &&
+				m->dir[i][j] != '0' && m->dir[i][j] != '1' &&
+				m->dir[i][j] != ' ')
+				return (1);
 			j++;
 		}
 		i++;
@@ -159,7 +173,8 @@ int	dir_check(t_map *m)
 	{
 		while (j < m->width)
 		{
-			if (m->dir[i][j] == 'N' || m->dir[i][j] == 'E' || m->dir[i][j] == 'S' || m->dir[i][j] == 'W')
+			if (m->dir[i][j] == 'N' || m->dir[i][j] == 'E' ||
+				m->dir[i][j] == 'S' || m->dir[i][j] == 'W')
 			{
 				m->player.pos.x = j;
 				m->player.pos.y = i;
@@ -188,8 +203,9 @@ int	space_check(t_map *m)
 	{
 		while (j < m->width)
 		{
-			if (m->dir[i][j] == '0' || m->dir[i][j] == 'N' || m->dir[i][j] == 'E' ||
-				m->dir[i][j] == 'S' || m->dir[i][j] == 'W')
+			if (m->dir[i][j] == '0' || m->dir[i][j] == 'N' ||
+				m->dir[i][j] == 'E' || m->dir[i][j] == 'S' ||
+				m->dir[i][j] == 'W')
 			{
 				if (m->dir[i + 1][j] == ' ' || m->dir[i - 1][j] == ' ' ||
 					m->dir[i][j + 1] == ' ' || m->dir[i][j - 1] == ' ')
@@ -232,13 +248,13 @@ int	cond_check(int i, int n, int status)
 
 int	dirtex_check(char *line, int i, int status)
 {
-	if (i == 0 && ft_strcmp(line, "NO")) //ft_strcmp!!
+	if (i == 0 && ft_strcmp(line, "NO"))
 		return (1);
-	else if (i == 1 && ft_strcmp(line, "SO")) //ft_strcmp!!
+	else if (i == 1 && ft_strcmp(line, "SO"))
 		return (1);
-	else if (i == 2 && ft_strcmp(line, "WE")) //ft_strcmp!!
+	else if (i == 2 && ft_strcmp(line, "WE"))
 		return (1);
-	else if (i == 3 && ft_strcmp(line, "EA")) //ft_strcmp!!
+	else if (i == 3 && ft_strcmp(line, "EA"))
 		return (1);
 	if (status == 1)
 		printf("Error: Texture not correct.\n");
@@ -263,15 +279,16 @@ int	format_check(char *line, int i, int status)
 	j = 0;
 	n = 0;
 	split = ft_split(line, ' ');
-	while(split[j])
+	while (split[j])
 		j++;
 	if (j != 2)
 	{
-		//free
+		if (j != 0)
+			free_string(split);
 		return (0);
 	}
 	n = line_check(split, i, status);
-	//free
+	free_string(split);
 	if (!n)
 		return (0);
 	return (1);
@@ -329,7 +346,7 @@ int	col_comma_check(char *line)
 {
 	int	i;
 	int	n;
-	
+
 	i = 0;
 	n = 0;
 	while (line[i])
@@ -356,7 +373,7 @@ int	cf_check(char **col, int n, int i)
 			return (1);
 	}
 	printf("Error: Ceiling/Floor color not correct.\n");
-	//free
+	free_string(col);
 	return (0);
 }
 
@@ -384,8 +401,99 @@ int	rgb_check(char **num, int n)
 		if (count == 3)
 			return (1);
 	}
-	//free
+	free_string(num);
 	return (printf("Error: RGB colors wrong.\n"), 0);
+}
+
+int	split_count(char **split)
+{
+	int	i;
+
+	i = 0;
+	while (split[i])
+		i++;
+	if (i != 6)
+		return (free_string(split), 0);
+	return (i);
+}
+
+int	cosp_check(char cosp, int *len, int *n, int j)
+{
+	if (cosp == ',')
+	{
+		if (*len > 0)
+			*size += 1;
+		*size += 1;
+		if (j == 1 && *len > 0)
+			return (*len);
+		if (j == 1 && len == 0)
+			return (1);
+		*len = 0;
+	}
+	else
+	{
+		if (*len > 0)
+			*size += 1;
+		if (j == 1 && *len > 0)
+			return (*len);
+		*len = 0;
+	}
+	return (0);
+}
+
+int	get_size(char *line, int i, int j)
+{
+	int	n;
+	int	len;
+	int	tmp;
+
+	n = 0;
+	len = 0;
+	tmp = 0;
+	while (line[i])
+	{
+		if (line[i] != ' ' && line[i] != ',')
+			len ++;
+		else
+			tmp = cosp_check(line[i], &len, &n, &j);
+		if (tmp > 0)
+			return (tmp);
+		i++;
+	}
+	if (len > 0)
+		n++;
+	if (j == 1 && len > 0)
+		return (len);
+	if (j == 1 && len == 0 && line[i - 1] == ',')
+		return (1);
+	return (n);
+}
+
+char	**cub_split(char *line)
+{
+	int		i;
+	int		j;
+	int		n;
+	int		len;
+	char	**split;
+
+	i = -1;
+	j = 0;
+	n = 0;
+	split = malloc(sizeof(char *) * get_size(line, 0, 2) + 1);
+	while (++i < get_size(line, 0, 2))
+	{
+		len = get_size(line, j, 1);
+		while (line[j] == ' ')
+			j++;
+		split[i] = malloc(sizeof(char) * len + 1);
+		while (n < len)
+			split[i][n++] = line[j++];
+		split[i][k] = '\0';
+	}
+	split[i] = NULL;
+	i = 0;	// maybe not useful
+	return (split);
 }
 
 int	col_format_check(char *line, int i)
@@ -395,12 +503,13 @@ int	col_format_check(char *line, int i)
 
 	if (!col_comma_check(line))
 		return (0);
-	//split input and check for a total of exactly 6 elements?
+	split = cub_split(line);
+	n = split_count(split);
 	if (!cf_check(split, n, i))
 		return (0);
 	if (!rgb_check(split, n))
 		return (0);
-	//free
+	free_string(split);
 	return (1);
 }
 
@@ -449,8 +558,22 @@ void	tex_store(t_map *m, int fd)
 		if (!no_content(line))
 			m->tex = ft_strdup(tmp[1]);
 		free(line);
-		//free array
+		free_string(tmp);
 	}
+}
+
+int	rgb_con(char *r, char *g, char *b)
+{
+	int	red;
+	int	green;
+	int	blue;
+	int	hex;
+
+	red = ft_atoi(r);
+	green = ft_atoi(g);
+	blue = ft_atoi(b);
+	hex = (red << 16) | (green << 8) | blue;
+	return (hex);
 }
 
 void	col_store(t_map *m, int fd)
@@ -466,10 +589,10 @@ void	col_store(t_map *m, int fd)
 		line = get_next_line(fd);
 		if (!line)
 			break ;
-		//tmp = split like col_format_check
+		tmp = cub_split(line);
 		if (!no_content(line))
 		{
-			//c = rgb to hex
+			c = rgb_con(tmp[1], tmp[3], tmp[5]);
 			if (i == 0)
 				m->f_col = c;
 			else
@@ -477,7 +600,7 @@ void	col_store(t_map *m, int fd)
 			i++;
 		}
 		free(line);
-		//free array
+		free_string(tmp);
 	}
 }
 
@@ -504,4 +627,14 @@ int	parser(t_map *m, char *file)
 	}
 	close (fd);
 	return (0);
+}
+
+int	ft_strcmp(char *str1, char *str2)
+{
+	int	i;
+
+	i = 0;
+	while ((str1[i] || str2[i]) && str1[i] == str2[i])
+		i++;
+	return (str1[i] - str2[i]);
 }
