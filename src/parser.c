@@ -6,7 +6,7 @@
 /*   By: rhortens <rhortens@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/13 13:15:57 by rhortens          #+#    #+#             */
-/*   Updated: 2023/10/17 19:12:27 by rhortens         ###   ########.fr       */
+/*   Updated: 2023/10/17 23:48:44 by rhortens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,17 +71,18 @@ int	read_check(char *file)
 		close(fd);
 		printf("file: %s", file);
 		printf("Error: File can't be read.\n");
-		return (1);
+		return (0);
 	}
 	close(fd);
-	return (0);
+	printf("file opened.\n");
+	return (1);
 }
 
 int	file_check(char *file)
 {
 	if (filename_error(file, ".cub") < 0)
 		return (1);
-	if (read_check(file))
+	if (!read_check(file))
 		return (1);
 	return (0);
 }
@@ -200,6 +201,7 @@ int	dir_check(t_map *m)
 			if (m->dir[i][j] == 'N' || m->dir[i][j] == 'E' ||
 				m->dir[i][j] == 'S' || m->dir[i][j] == 'W')
 			{
+				//player direction = m->dir[i][j]
 				m->player.pos.x = j;
 				m->player.pos.y = i;
 				n++;
@@ -289,16 +291,16 @@ static int	dirtex_check(char *line, int i, int status)
 static int	srctex_check(char *src)
 {
 	if (!read_check(src))
-		return (0);
+		return (printf("not opened\n"), 0);
 	return (1);
 }
 
 static int	line_check(char **split, int i, int status)
 {
 	if (!srctex_check(split[1]))
-		return (0);
+		return (printf("srctex\n"), 0);
 	if (!dirtex_check(split[0], i, status))
-		return (0);
+		return (printf("dirtex\n"), 0);
 	return (1);
 }
 
@@ -320,6 +322,7 @@ static int	format_check(char *line, int i, int status)
 		return (0);
 	}
 	n = line_check(split, i, status);
+	printf("format n: %d\n", n);
 	free_string(split);
 	if (!n)
 		return (0);
@@ -334,16 +337,17 @@ int	wrong_texture(t_map *m, int fd, int status)
 
 	i = 0;
 	n = 1;
-	while (i < 4 && n)
+	while (++i < 4 && n)
 	{
 		line = get_next_line(fd);
 		if (!line)
 			break ;
 		m->line_count++;
 		if (!no_content(line))
-			n = format_check(line, i++, status);
+			n = format_check(line, i, status);
 		free(line);
 	}
+	printf("wrong i: %d\n", i);
 	return (cond_check(i, n, status));
 }
 
@@ -367,7 +371,7 @@ static int	texture_check(t_map *m, int fd, char *file)
 	}
 	m->line_count = 0;
 	while (++i < m->tex_count)
-		wrong_texture(m, fd, 0);
+		wrong_texture(m, fd, 1);
 	return (0);
 }
 
@@ -469,7 +473,7 @@ static int	cosp_check(char cosp, int *len, int *n, int j)
 		*n += 1;
 		if (j == 1 && *len > 0)
 			return (*len);
-		if (j == 1 && len == 0)
+		if (j == 1 && *len == 0)
 			return (1);
 		*len = 0;
 	}
@@ -520,11 +524,11 @@ char	**cub_split(char *line)
 	int		len;
 	char	**split;
 
-	i = -1;
+	i = 0;
 	j = 0;
 	n = 0;
 	split = malloc(sizeof(char *) * get_size(line, 0, 2) + 1);
-	while (++i < get_size(line, 0, 2))
+	while (i < get_size(line, 0, 2))
 	{
 		len = get_size(line, j, 1);
 		while (line[j] == ' ')
@@ -533,6 +537,7 @@ char	**cub_split(char *line)
 		while (n < len)
 			split[i][n++] = line[j++];
 		split[i][n] = '\0';
+		i++;
 	}
 	split[i] = NULL;
 	i = 0;	// maybe not useful
@@ -575,7 +580,8 @@ int	color_check(t_map *m, int fd)
 		m->line_count++;
 		printf("line: %s\n", line);
 		if (!no_content(line))
-			n = col_format_check(line, i++);
+			n = col_format_check(line, i);
+		i++;
 		free(line);
 		if (i > 1 || !n)
 			break ;
@@ -605,9 +611,9 @@ static void	tex_store(t_map *m, int fd)
 			break ;
 		tmp = ft_split(line, ' ');
 		if (!no_content(line))
-			m->tex = ft_strdup(tmp[1]);
-		free(line);
+			m->tex[i++] = *ft_strdup(tmp[1]);
 		free_string(tmp);
+		free(line);
 	}
 }
 
