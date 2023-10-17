@@ -6,14 +6,14 @@
 /*   By: rhortens <rhortens@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 01:00:44 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/16 11:40:31 by rhortens         ###   ########.fr       */
+/*   Updated: 2023/10/17 10:06:30 by rhortens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB3D_H
 # define CUB3D_H
 
-# include "../MLX42/include/MLX42/MLX42.h"
+//# include "../MLX42/include/MLX42/MLX42.h"
 # include "../libft/libft.h"
 # include <stdlib.h>
 # include <unistd.h>
@@ -47,10 +47,10 @@ typedef struct s_player
 typedef struct s_map
 {
 	int				map_fd;
-	mlx_texture_t	*north;
-	mlx_texture_t	*south;
-	mlx_texture_t	*west;
-	mlx_texture_t	*east;
+	// mlx_texture_t	*north;
+	// mlx_texture_t	*south;
+	// mlx_texture_t	*west;
+	// mlx_texture_t	*east;
 	char			*floor;
 	char			*ceil;
 	int				width;
@@ -59,7 +59,7 @@ typedef struct s_map
 	t_player		player;
 	int				line_count;
 	int				tex_count;
-	char			**tex;
+	char			*tex;
 	int				f_col;
 	int				c_col;
 }	t_map;
@@ -87,8 +87,8 @@ typedef struct s_ray
 
 typedef struct s_mlxinfo
 {
-	mlx_t		*mlx;
-	mlx_image_t *img;
+	// mlx_t		*mlx;
+	// mlx_image_t *img;
 	t_player	player;
 	t_ray		ray;
 	// t_map		map;

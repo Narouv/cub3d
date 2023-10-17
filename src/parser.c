@@ -6,11 +6,21 @@
 /*   By: rhortens <rhortens@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/13 13:15:57 by rhortens          #+#    #+#             */
-/*   Updated: 2023/10/16 19:00:22 by rhortens         ###   ########.fr       */
+/*   Updated: 2023/10/17 10:18:57 by rhortens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/cub3d.h"
+
+int	ft_strcmp(char *str1, char *str2)
+{
+	int	i;
+
+	i = 0;
+	while ((str1[i] || str2[i]) && str1[i] == str2[i])
+		i++;
+	return (str1[i] - str2[i]);
+}
 
 void	free_string(char **str)
 {
@@ -49,21 +59,22 @@ int	read_check(char *file)
 {
 	int	fd;
 
-	fd = open(file, 0_RDONLY);
+	fd = open(file, O_RDONLY);
 	if (fd < 0)
 	{
 		close(fd);
 		printf("Error: File can't be read.\n");
+		return (1);
 	}
 	close(fd);
-	return (1);
+	return (0);
 }
 
 int	file_check(char *file)
 {
 	if (filename_error(file, ".cub") < 0)
 		return (1);
-	if (!read_check(file))
+	if (read_check(file))
 		return (1);
 	return (0);
 }
@@ -109,6 +120,12 @@ int	no_content(char *str)
 	return (0);
 }
 
+void	space_add(char **line, int start, int end)
+{
+	while (start < end)
+		(*line)[start++] = ' ';
+}
+
 void	map_fill(t_map *m, int fd)
 {
 	int		i;
@@ -129,10 +146,10 @@ void	map_fill(t_map *m, int fd)
 			m->dir[i][j] = ' ';
 			while (++j < (ft_strlen(line) + 1))
 				m->dir[i][j] = line[j - 1];
-			//fill spaces
+			space_add(&(m->dir[i++]), j, m->width);
 		}
 		else if (i > 0)
-			//fill spaces
+			space_add(&(m->dir[i++]), 0, m->width);
 		free(line);
 	}
 }
@@ -222,17 +239,18 @@ int	map_validation(t_map *m, int fd, char *file)
 {
 	map_dir(m, fd);
 	close (fd);
-	fd = open(file, 0_RDONLY);
-	//fill spaces
+	fd = open(file, O_RDONLY);
+	space_add(&(m->dir[0]), 0, m->width);
 	map_fill(m, fd);
-	//fill spaces
+	space_add(&(m->dir[m->height - 1]), 0, m->width);
 	if (map_check(m) || dir_check(m) || space_check(m))
 	{
 		printf("Error: Map not valid.\n");
-		//free
+		free_string(m->dir);
 		return (1);
 	}
 	//initialize stuff
+	return (0);
 }
 
 int	cond_check(int i, int n, int status)
@@ -323,7 +341,7 @@ int	texture_check(t_map *m, int fd, char *file)
 	i = 0;
 	m->line_count = 0;
 	m->tex_count = 0;
-	tmp = open(file, 0_RDONLY);
+	tmp = open(file, O_RDONLY);
 	while (!wrong_texture(m, tmp, 0))
 		m->tex_count++;
 	close(tmp);
@@ -336,7 +354,7 @@ int	texture_check(t_map *m, int fd, char *file)
 	m->line_count = 0;
 	while (i < m->tex_count)
 	{
-		texture_check(m, fd, 1);
+		wrong_texture(m, fd, 1);
 		i++;
 	}
 	return (0);
@@ -377,6 +395,20 @@ int	cf_check(char **col, int n, int i)
 	return (0);
 }
 
+int	cub_digit(char *c)
+{
+	int	i;
+
+	i = 0;
+	while (c[i])
+	{
+		if (!ft_isdigit(c[i]))
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
 int	rgb_check(char **num, int n)
 {
 	int	i;
@@ -386,7 +418,7 @@ int	rgb_check(char **num, int n)
 	i = 0;
 	tmp = 0;
 	count = 0;
-	if (ft_isdigit(num[1]) && ft_isdigit(num[3]) && ft_isdigit(num[5]))
+	if (cub_digit(num[1]) && cub_digit(num[3]) && cub_digit(num[5]))
 	{
 		while (i < n)
 		{
@@ -422,8 +454,8 @@ int	cosp_check(char cosp, int *len, int *n, int j)
 	if (cosp == ',')
 	{
 		if (*len > 0)
-			*size += 1;
-		*size += 1;
+			*n += 1;
+		*n += 1;
 		if (j == 1 && *len > 0)
 			return (*len);
 		if (j == 1 && len == 0)
@@ -433,7 +465,7 @@ int	cosp_check(char cosp, int *len, int *n, int j)
 	else
 	{
 		if (*len > 0)
-			*size += 1;
+			*n += 1;
 		if (j == 1 && *len > 0)
 			return (*len);
 		*len = 0;
@@ -455,7 +487,7 @@ int	get_size(char *line, int i, int j)
 		if (line[i] != ' ' && line[i] != ',')
 			len ++;
 		else
-			tmp = cosp_check(line[i], &len, &n, &j);
+			tmp = cosp_check(line[i], &len, &n, j);
 		if (tmp > 0)
 			return (tmp);
 		i++;
@@ -489,7 +521,7 @@ char	**cub_split(char *line)
 		split[i] = malloc(sizeof(char) * len + 1);
 		while (n < len)
 			split[i][n++] = line[j++];
-		split[i][k] = '\0';
+		split[i][n] = '\0';
 	}
 	split[i] = NULL;
 	i = 0;	// maybe not useful
@@ -610,31 +642,43 @@ int	parser(t_map *m, char *file)
 
 	if (file_check(file))
 		return (1);
-	fd = open(file, 0_RDONLY);
+	fd = open(file, O_RDONLY);
 	if (texture_check(m, fd, file) || color_check(m, fd))
 	{
 		close(fd);
 		return (1);
 	}
 	close(fd);
-	fd = open(file, 0_RDONLY);
+	fd = open(file, O_RDONLY);
 	tex_store(m, fd);
 	col_store(m, fd);
-	if (map_validatiton(m, fd, file))
+	if (map_validation(m, fd, file))
 	{
 		close(fd);
 		return (1);
 	}
-	close (fd);
+	close(fd);
 	return (0);
 }
 
-int	ft_strcmp(char *str1, char *str2)
-{
-	int	i;
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        printf("Usage: %s <map_file>\n", argv[0]);
+        return 1;
+    }
 
-	i = 0;
-	while ((str1[i] || str2[i]) && str1[i] == str2[i])
-		i++;
-	return (str1[i] - str2[i]);
+    char *map_file = argv[1];
+    t_map map;
+
+    if (parser(&map, map_file) == 0) {
+        printf("Map parsing successful!\n");
+
+        // Optionally, you can print or manipulate the parsed map data here.
+
+    } else {
+        printf("Map parsing failed!\n");
+    }
+
+    return 0;
 }
+
