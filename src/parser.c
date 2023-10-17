@@ -6,7 +6,7 @@
 /*   By: rhortens <rhortens@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/13 13:15:57 by rhortens          #+#    #+#             */
-/*   Updated: 2023/10/17 10:18:57 by rhortens         ###   ########.fr       */
+/*   Updated: 2023/10/17 19:12:27 by rhortens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,15 @@ int	ft_strcmp(char *str1, char *str2)
 	int	i;
 
 	i = 0;
-	while ((str1[i] || str2[i]) && str1[i] == str2[i])
+	if (ft_strlen(str1) != ft_strlen(str2))
+		return (0);
+	while (str1[i])
+	{
+		if (str1[i] != str2[i])
+			return (0);
 		i++;
-	return (str1[i] - str2[i]);
+	}
+	return (1);
 }
 
 void	free_string(char **str)
@@ -63,6 +69,7 @@ int	read_check(char *file)
 	if (fd < 0)
 	{
 		close(fd);
+		printf("file: %s", file);
 		printf("Error: File can't be read.\n");
 		return (1);
 	}
@@ -79,7 +86,7 @@ int	file_check(char *file)
 	return (0);
 }
 
-void	map_dir(t_map *m, int fd)
+static void	map_dir(t_map *m, int fd)
 {
 	int		i;
 	char	*line;
@@ -113,20 +120,20 @@ int	no_content(char *str)
 
 	i = 0;
 	j = ft_strlen(str);
-	while (str[i] && (str[i] == ' ' || str[i] == '\t'))
+	while (str[i] && (str[i] == ' ' || str[i] == '\t' || str[i] == '\n'))
 		i++;
 	if (i == j)
 		return (1);
 	return (0);
 }
 
-void	space_add(char **line, int start, int end)
+static void	space_add(char **line, int start, int end)
 {
 	while (start < end)
 		(*line)[start++] = ' ';
 }
 
-void	map_fill(t_map *m, int fd)
+static void	map_fill(t_map *m, int fd)
 {
 	int		i;
 	int		j;
@@ -264,7 +271,7 @@ int	cond_check(int i, int n, int status)
 	return (0);
 }
 
-int	dirtex_check(char *line, int i, int status)
+static int	dirtex_check(char *line, int i, int status)
 {
 	if (i == 0 && ft_strcmp(line, "NO"))
 		return (1);
@@ -279,16 +286,23 @@ int	dirtex_check(char *line, int i, int status)
 	return (0);
 }
 
-int	line_check(char **split, int i, int status)
+static int	srctex_check(char *src)
 {
-	if (!read_check(split[1]))
+	if (!read_check(src))
+		return (0);
+	return (1);
+}
+
+static int	line_check(char **split, int i, int status)
+{
+	if (!srctex_check(split[1]))
 		return (0);
 	if (!dirtex_check(split[0], i, status))
 		return (0);
 	return (1);
 }
 
-int	format_check(char *line, int i, int status)
+static int	format_check(char *line, int i, int status)
 {
 	int		j;
 	int		n;
@@ -320,7 +334,7 @@ int	wrong_texture(t_map *m, int fd, int status)
 
 	i = 0;
 	n = 1;
-	while (n && i < 4)
+	while (i < 4 && n)
 	{
 		line = get_next_line(fd);
 		if (!line)
@@ -333,12 +347,12 @@ int	wrong_texture(t_map *m, int fd, int status)
 	return (cond_check(i, n, status));
 }
 
-int	texture_check(t_map *m, int fd, char *file)
+static int	texture_check(t_map *m, int fd, char *file)
 {
 	int	i;
 	int	tmp;
 
-	i = 0;
+	i = -1;
 	m->line_count = 0;
 	m->tex_count = 0;
 	tmp = open(file, O_RDONLY);
@@ -352,11 +366,8 @@ int	texture_check(t_map *m, int fd, char *file)
 		return (1);
 	}
 	m->line_count = 0;
-	while (i < m->tex_count)
-	{
-		wrong_texture(m, fd, 1);
-		i++;
-	}
+	while (++i < m->tex_count)
+		wrong_texture(m, fd, 0);
 	return (0);
 }
 
@@ -373,19 +384,19 @@ int	col_comma_check(char *line)
 			n++;
 		i++;
 	}
-	if (n != 2)
-		return (0);
-	return (1);
+	if (n == 2)
+		return (1);
+	return (0);
 }
 
-int	cf_check(char **col, int n, int i)
+static int	cf_check(char **col, int n, int i)
 {
 	if (i == 0)
 	{
 		if (ft_strcmp(col[0], "F"))
 			return (1);
 	}
-	if (i == 1)
+	else if (i == 1)
 	{
 		if (ft_strcmp(col[0], "C"))
 			return (1);
@@ -409,7 +420,7 @@ int	cub_digit(char *c)
 	return (1);
 }
 
-int	rgb_check(char **num, int n)
+static int	rgb_check(char **num, int n)
 {
 	int	i;
 	int	tmp;
@@ -449,7 +460,7 @@ int	split_count(char **split)
 	return (i);
 }
 
-int	cosp_check(char cosp, int *len, int *n, int j)
+static int	cosp_check(char cosp, int *len, int *n, int j)
 {
 	if (cosp == ',')
 	{
@@ -528,7 +539,7 @@ char	**cub_split(char *line)
 	return (split);
 }
 
-int	col_format_check(char *line, int i)
+static int	col_format_check(char *line, int i)
 {
 	int		n;
 	char	**split;
@@ -537,6 +548,9 @@ int	col_format_check(char *line, int i)
 		return (0);
 	split = cub_split(line);
 	n = split_count(split);
+	printf("n form: %d\n", n);
+	if (n == 0)
+		return (0);
 	if (!cf_check(split, n, i))
 		return (0);
 	if (!rgb_check(split, n))
@@ -559,12 +573,15 @@ int	color_check(t_map *m, int fd)
 		if (!line)
 			break ;
 		m->line_count++;
+		printf("line: %s\n", line);
 		if (!no_content(line))
 			n = col_format_check(line, i++);
 		free(line);
 		if (i > 1 || !n)
 			break ;
 	}
+	printf("i: %d\n", i);
+	printf("n: %d\n", n);
 	if (i < 2 || !n)
 	{
 		printf("Error: Color input wrong.\n");
@@ -573,7 +590,7 @@ int	color_check(t_map *m, int fd)
 	return (0);
 }
 
-void	tex_store(t_map *m, int fd)
+static void	tex_store(t_map *m, int fd)
 {
 	int		i;
 	char	**tmp;
@@ -608,7 +625,7 @@ int	rgb_con(char *r, char *g, char *b)
 	return (hex);
 }
 
-void	col_store(t_map *m, int fd)
+static void	col_store(t_map *m, int fd)
 {
 	int		i;
 	int		c;
@@ -643,6 +660,8 @@ int	parser(t_map *m, char *file)
 	if (file_check(file))
 		return (1);
 	fd = open(file, O_RDONLY);
+	if (fd == -1)
+		return (printf("Error: Opening file.\n"), 1);
 	if (texture_check(m, fd, file) || color_check(m, fd))
 	{
 		close(fd);
@@ -662,23 +681,17 @@ int	parser(t_map *m, char *file)
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        printf("Usage: %s <map_file>\n", argv[0]);
-        return 1;
-    }
-
-    char *map_file = argv[1];
-    t_map map;
-
-    if (parser(&map, map_file) == 0) {
-        printf("Map parsing successful!\n");
-
-        // Optionally, you can print or manipulate the parsed map data here.
-
-    } else {
-        printf("Map parsing failed!\n");
-    }
-
-    return 0;
+	if (argc != 2) {
+		printf("Usage: %s <map_file>\n", argv[0]);
+		return (1);
+	}
+	char *map_file = argv[1];
+	t_map	map;
+	if (parser(&map, map_file) == 0) {
+		printf("Map parsing successful!\n");
+	} else {
+		printf("Map parsing failed!\n");
+	}
+	return (0);
 }
 
