@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 00:58:05 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/16 21:25:32 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/17 16:55:50 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,8 +84,6 @@ int	*get_pixel_data(char *img_path)
 	mlx_texture_t	*t;
 
 	t = mlx_load_png(img_path);
-	if (!t)
-		exit(1);
 	p = t->bytes_per_pixel;
 	ty = 0;
 	txt_arr = malloc(sizeof(int) * TEX_HEIGHT * TEX_WIDTH);
@@ -170,7 +168,6 @@ void	update_ray(t_ray *ray, t_player *player, double camera)
 	ray->delta_dist.y = fabs(1 / ray->angle.y);
 	ray->map_pos.x = (int)player->pos.x;
 	ray->map_pos.y = (int)player->pos.y;
-	// printf("player view dir %f %f\nplayer cam plane %f %f\n", player->viewdir.x, player->viewdir.y, player->plane.x, player->plane.y);
 }
 
 void	draw_pixel_column(t_mlxinfo *game, int x, t_texture *texture)
@@ -254,11 +251,8 @@ void	cast_rays(t_mlxinfo *game)
 	{
 		camera = 2 * x / (double)WIDTH - 1;
 		update_ray(ray, player, camera);
-		//decide ray step direction
 		ray_direction(ray, player);
-		// dda
 		ray_length(ray);
-		// draw vertical line
 		draw_pixel_column(game, x, game->texture[get_texture_side(ray)]);
 		x++;
 	}
@@ -284,6 +278,32 @@ void	clear_screen(void *param)
 	}
 }
 
+void	rot_fov(t_mlxinfo *game, double rot_val)
+{
+	double		odx;
+	double		ody;
+	double		rs;
+	t_player	p;
+
+	p = game->player;
+	rs = (game->time - game->old_time) * rot_val;
+	odx = p.viewdir.x;
+	p.viewdir.x = p.viewdir.x * cos(rs) - p.viewdir.y * sin(rs);
+	p.viewdir.y = odx * sin(rs) + p.viewdir.y * cos(rs);
+	ody = p.plane.x;
+	p.plane.x = p.plane.x * cos(rs) - p.plane.y * sin(rs);
+	p.plane.y = ody * sin(rs) + p.plane.y * cos(rs);
+}
+
+void	move_player(t_mlxinfo *game, t_vec axis, double val)
+{
+	double	move_speed;
+
+	move_speed = (game->time - game->old_time) * val;
+	game->player.pos.x += axis.x * move_speed;
+	game->player.pos.y += axis.y * move_speed;
+}
+
 void	ft_controls(void *g)
 {
 	t_mlxinfo	*game;
@@ -293,53 +313,18 @@ void	ft_controls(void *g)
 	game->time = mlx_get_time();
 	clear_screen(game->img);
 	cast_rays(game);
-	
-	double	frame_time = game->time - game->old_time;
-	double	move_speed = frame_time * 5.0;
-	double	rot_speed = frame_time * 3.0;
 	if (mlx_is_key_down(game->mlx, MLX_KEY_W))
-	{
-		game->player.pos.x += game->player.viewdir.x * move_speed;
-		game->player.pos.y += game->player.viewdir.y * move_speed;
-	}
-	//move backwards
+		move_player(game, game->player.viewdir, 5.0);
 	if (mlx_is_key_down(game->mlx, MLX_KEY_S))
-	{
-		game->player.pos.x -= game->player.viewdir.x * move_speed;
-		game->player.pos.y -= game->player.viewdir.y * move_speed;
-	}
-	// move right
+		move_player(game, game->player.viewdir, -5.0);
 	if (mlx_is_key_down(game->mlx, MLX_KEY_D))
-	{
-		game->player.pos.x += game->player.plane.x * move_speed;
-		game->player.pos.y += game->player.plane.y * move_speed;
-	}
-	// move left
+		move_player(game, game->player.plane, 5.0);
 	if (mlx_is_key_down(game->mlx, MLX_KEY_A))
-	{
-		game->player.pos.x -= game->player.plane.x * move_speed;
-		game->player.pos.y -= game->player.plane.y * move_speed;
-	}
-	//rotate to the right
+		move_player(game, game->player.plane, -5.0);
 	if (mlx_is_key_down(game->mlx, MLX_KEY_RIGHT))
-	{
-		double oldDirX = game->player.viewdir.x;
-		game->player.viewdir.x = game->player.viewdir.x * cos(-rot_speed) - game->player.viewdir.y * sin(-rot_speed);
-		game->player.viewdir.y = oldDirX * sin(-rot_speed) + game->player.viewdir.y * cos(-rot_speed);
-		double oldPlaneX = game->player.plane.x;
-		game->player.plane.x = game->player.plane.x * cos(-rot_speed) - game->player.plane.y * sin(-rot_speed);
-		game->player.plane.y = oldPlaneX * sin(-rot_speed) + game->player.plane.y * cos(-rot_speed);
-	}
-	//rotate to the left
+		rot_fov(game, -3.0);
 	if (mlx_is_key_down(game->mlx, MLX_KEY_LEFT))
-	{
-		double oldDirX = game->player.viewdir.x;
-		game->player.viewdir.x = game->player.viewdir.x * cos(rot_speed) - game->player.viewdir.y * sin(rot_speed);
-		game->player.viewdir.y = oldDirX * sin(rot_speed) + game->player.viewdir.y * cos(rot_speed);
-		double oldPlaneX = game->player.plane.x;
-		game->player.plane.x = game->player.plane.x * cos(rot_speed) - game->player.plane.y * sin(rot_speed);
-		game->player.plane.y = oldPlaneX * sin(rot_speed) + game->player.plane.y * cos(rot_speed);
-	}
+		rot_fov(game, 3.0);
 	if (mlx_is_key_down(game->mlx, MLX_KEY_ESCAPE))
 		mlx_close_window(game->mlx);
 }
@@ -361,7 +346,7 @@ int	main(void)
 {
 	t_mlxinfo	*game;
 	mlx_t		*mlx;
-	
+
 	game = malloc(sizeof(t_mlxinfo));
 	init_game(game);
 	game->mlx = mlx_init(WIDTH, HEIGHT, "cub3d", true);

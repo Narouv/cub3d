@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d_bonus.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 01:00:44 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/15 18:38:41 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/17 16:43:29 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ typedef struct s_player
 {
 	t_vec	pos;
 	t_vec	viewdir;
-	t_vec	plane; //change name to something better cam_distance? cam_plane? fov?
+	t_vec	plane;
 }	t_player;
 
 typedef struct s_map
@@ -57,6 +57,7 @@ typedef struct s_map
 
 typedef struct s_texture
 {
+	int		*pixels;
 	int		x;
 	double	y;
 	double	tex_step;
@@ -66,16 +67,21 @@ typedef struct s_texture
 
 typedef struct s_ray
 {
-	t_vec	angle;
-	t_vec	delta_dist;
-	t_vec	side_dist;
-	t_veci	map_pos;
-	t_veci	step_dir;
-	int		side;
-	double	length;
-	int		door;
-	t_texture texture;
+	t_vec		angle;
+	t_vec		delta_dist;
+	t_vec		side_dist;
+	t_veci		map_pos;
+	t_veci		step_dir;
+	int			side;
+	double		length;
 }	t_ray;
+
+typedef struct s_sprite
+{
+	t_vec	pos;
+	int		frame_count;
+	int		**pixels
+}
 
 typedef struct s_mlxinfo
 {
@@ -83,6 +89,8 @@ typedef struct s_mlxinfo
 	mlx_image_t *img;
 	t_player	player;
 	t_ray		ray;
+	t_texture	**texture;
+	t_sprite	**sprites;
 	// t_map		map;
 	double		time;
 	double		str_update_time;
