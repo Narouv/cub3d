@@ -6,7 +6,7 @@
 /*   By: rhortens <rhortens@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 01:00:44 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/17 10:06:30 by rhortens         ###   ########.fr       */
+/*   Updated: 2023/10/18 17:16:29 by rhortens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ typedef struct s_player
 	t_vec	pos;
 	t_vec	viewdir;
 	t_vec	plane; //change name to something better cam_distance? cam_plane? fov?
+	char	stand;
 }	t_player;
 
 typedef struct s_map
