@@ -6,7 +6,7 @@
 /*   By: rhortens <rhortens@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/13 13:15:57 by rhortens          #+#    #+#             */
-/*   Updated: 2023/10/17 23:48:44 by rhortens         ###   ########.fr       */
+/*   Updated: 2023/10/18 10:36:56 by rhortens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,6 +275,8 @@ int	cond_check(int i, int n, int status)
 
 static int	dirtex_check(char *line, int i, int status)
 {
+	printf("line: %s\n", line);
+	printf("dirtex i: %d\n", i);
 	if (i == 0 && ft_strcmp(line, "NO"))
 		return (1);
 	else if (i == 1 && ft_strcmp(line, "SO"))
@@ -297,8 +299,8 @@ static int	srctex_check(char *src)
 
 static int	line_check(char **split, int i, int status)
 {
-	if (!srctex_check(split[1]))
-		return (printf("srctex\n"), 0);
+	// if (!srctex_check(split[1]))
+	// 	return (printf("srctex\n"), 0);
 	if (!dirtex_check(split[0], i, status))
 		return (printf("dirtex\n"), 0);
 	return (1);
@@ -335,9 +337,9 @@ int	wrong_texture(t_map *m, int fd, int status)
 	int		n;
 	char	*line;
 
-	i = 0;
+	i = -1;
 	n = 1;
-	while (++i < 4 && n)
+	while (++i <= 3 && n)
 	{
 		line = get_next_line(fd);
 		if (!line)
@@ -348,6 +350,7 @@ int	wrong_texture(t_map *m, int fd, int status)
 		free(line);
 	}
 	printf("wrong i: %d\n", i);
+	printf("line count: %d\n", m->line_count);
 	return (cond_check(i, n, status));
 }
 
@@ -363,15 +366,16 @@ static int	texture_check(t_map *m, int fd, char *file)
 	while (!wrong_texture(m, tmp, 0))
 		m->tex_count++;
 	close(tmp);
-	if (m->tex_count == 0)
-	{
-		while (!wrong_texture(m, tmp, 1))
-			m->tex_count++;
-		return (1);
-	}
+	printf("texcount: %d\n", m->tex_count);
+	// if (m->tex_count == 0)
+	// {
+	// 	while (!wrong_texture(m, tmp, 1))
+	// 		m->tex_count++;
+	// 	return (1);
+	// }
 	m->line_count = 0;
-	while (++i < m->tex_count)
-		wrong_texture(m, fd, 1);
+	// while (++i < m->tex_count)
+	// 	wrong_texture(m, fd, 1);
 	return (0);
 }
 
@@ -540,7 +544,7 @@ char	**cub_split(char *line)
 		i++;
 	}
 	split[i] = NULL;
-	i = 0;	// maybe not useful
+	i = 0;
 	return (split);
 }
 
