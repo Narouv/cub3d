@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rhortens <rhortens@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/13 13:15:57 by rhortens          #+#    #+#             */
-/*   Updated: 2023/10/19 15:46:56 by rhortens         ###   ########.fr       */
+/*   Updated: 2023/10/19 19:10:13 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/cub3d.h"
+
+int	color_check(t_map *m, int fd);
 
 int	ft_strcmp(char *str1, char *str2)
 {
@@ -100,16 +102,16 @@ static void	map_dir(t_map *m, int fd)
 		line = get_next_line(fd);
 		if (!line)
 			break ;
-		if (ft_strlen(line) > m->width)
+		if (ft_strlen(line) > (size_t)m->width)
 			m->width = ft_strlen(line);
 		free(line);
 		m->height++;
 	}
 	m->width += 2;
-	m->dir = malloc (m->height * sizeof(char *));
+	m->dir = ft_calloc(m->height, sizeof(char *));
 	while (i < m->height)
 	{
-		m->dir[i] = malloc((m->width + 1) * sizeof(char));
+		m->dir[i] = ft_calloc(m->width + 1, sizeof(char));
 		m->dir[i++][m->width] = '\0';
 	}
 }
@@ -201,7 +203,7 @@ int	map_check(t_map *m)
 	int	i;
 	int	j;
 
-	i = m->line_count + 1;
+	i = 1;
 	while (i < m->height)
 	{
 		j = 0;
@@ -225,7 +227,7 @@ int	dir_check(t_map *m)
 	int	j;
 	int	n;
 
-	i = m->line_count;
+	i = 0;
 	n = 0;
 	while (++i < m->height)
 	{
@@ -258,13 +260,13 @@ int	space_check(t_map *m) //0 in line
 	int	i;
 	int	j;
 
-	i = m->line_count + 1;
+	i = 1;
 	while (i < m->height)
 	{
 		j = 0;
 		while (j < m->width)
 		{
-			printf("dir i: %d, j: %d\n", i, j);
+			// printf("dir i: %d, j: %d\n", i, j);
 			if (m->dir[i][j] == '0' || m->dir[i][j] == 'N' ||
 				m->dir[i][j] == 'E' || m->dir[i][j] == 'S' ||
 				m->dir[i][j] == 'W')
@@ -387,19 +389,19 @@ int	wrong_texture(t_map *m, int fd)
 	return (cond_check(i, n));
 }
 
-static int	texture_check(t_map *m, int fd, char *file)
-{
-	int	i;
-	int	tmp;
+// static int	texture_check(t_map *m, char *file)
+// {
+// 	int	i;
+// 	int	tmp;
 
-	i = -1;
-	m->tex_count = 0;
-	tmp = open(file, O_RDONLY);
-	while (wrong_texture(m, tmp))
-		m->tex_count++;
-	close(tmp);
-	return (0);
-}
+// 	i = -1;
+// 	m->tex_count = 0;
+// 	tmp = open(file, O_RDONLY);
+// 	while (wrong_texture(m, tmp))
+// 		m->tex_count++;
+// 	close(tmp);
+// 	return (0);
+// }
 
 int	col_comma_check(char *line)
 {
@@ -419,7 +421,7 @@ int	col_comma_check(char *line)
 	return (0);
 }
 
-static int	cf_check(char **col, int n, int i)
+static int	cf_check(char **col, int i)
 {
 	if (i == 0)
 	{
@@ -552,7 +554,7 @@ char	**cub_split(char *line)
 
 	i = 0;
 	j = 0;
-	split = malloc(sizeof(char *) * get_size(line, 0, 2) + 1);
+	split = malloc(sizeof(char *) * get_size(line, 0, 2) + 8);
 	while (i < get_size(line, 0, 2))
 	{
 		n = 0;
@@ -585,7 +587,7 @@ static int	col_format_check(char *line, int i)
 	n = split_count(split);
 	if (n == 0)
 		return (0);
-	if (!cf_check(split, n, i))
+	if (!cf_check(split, i))
 		return (0);
 	if (!rgb_check(split, n))
 		return (0);
