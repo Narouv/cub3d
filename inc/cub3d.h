@@ -6,7 +6,7 @@
 /*   By: rhortens <rhortens@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 01:00:44 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/18 17:16:29 by rhortens         ###   ########.fr       */
+/*   Updated: 2023/10/19 00:45:32 by rhortens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ typedef struct s_map
 	t_player		player;
 	int				line_count;
 	int				tex_count;
-	char			*tex;
+	char			**tex;
 	int				f_col;
 	int				c_col;
 }	t_map;

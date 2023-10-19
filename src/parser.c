@@ -6,7 +6,7 @@
 /*   By: rhortens <rhortens@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/13 13:15:57 by rhortens          #+#    #+#             */
-/*   Updated: 2023/10/18 21:48:14 by rhortens         ###   ########.fr       */
+/*   Updated: 2023/10/19 15:46:56 by rhortens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ static void	map_dir(t_map *m, int fd)
 	char	*line;
 
 	i = 0;
-	m->height = 1;
+	m->height = m->line_count + 2;
 	m->width = 0;
 	while (1)
 	{
@@ -110,8 +110,7 @@ static void	map_dir(t_map *m, int fd)
 	while (i < m->height)
 	{
 		m->dir[i] = malloc((m->width + 1) * sizeof(char));
-		i++;
-		// m->dir[i++][m->width] = '\0';
+		m->dir[i++][m->width] = '\0';
 	}
 }
 
@@ -129,25 +128,25 @@ int	no_content(char *str)
 	return (0);
 }
 
-static void	space_add(t_map *map, char *line, int i, int end)
-{
-	int	len;
-	int	j;
+// static void	space_add(t_map *map, char **line, int i, int end)
+// {
+// 	int	len;
+// 	int	j;
 	
-	len = ft_strlen(line);
-	j = 0;
-	map->dir[i][j++] = ' ';
-	while (line[j - 1] != '\n')
-	{
-		map->dir[i][j] = line[j - 1];
-		j++;
-	}
-	// add missing spaces
-	while (len < end)
-		map->dir[i][len++] = ' ';
-	// add new line at end
-	map->dir[i][j] = '\n';
-}
+// 	len = ft_strlen(*line);
+// 	j = 0;
+// 	map->dir[i][j++] = ' ';
+// 	while (*line[j - 1] != '\n')
+// 	{
+// 		map->dir[i][j] = *line[j - 1];
+// 		j++;
+// 	}
+// 	// add missing spaces
+// 	while (len < end)
+// 		map->dir[i][len++] = ' ';
+// 	// add new line at end
+// 	map->dir[i][j] = '\n';
+// }
 
 static void	map_fill(t_map *m, int fd)
 {
@@ -163,31 +162,38 @@ static void	map_fill(t_map *m, int fd)
 		line = get_next_line(fd);
 	while (line)
 	{
-		j = 0;
 		if (!no_content(line))
 		{
 			len = ft_strlen(line);
 			j = 0;
 			m->dir[i][j++] = ' ';
-			while (line[j - 1] != '\n')
+			while (j < len + 1)
 			{
 				m->dir[i][j] = line[j - 1];
+				printf("%c", m->dir[i][j]);
 				j++;
 			}
 			// add missing spaces
 			while (len < m->width)
+			{
 				m->dir[i][len++] = ' ';
+				printf("%c", m->dir[i][len]);
+			}
 			// add new line at end
 			m->dir[i][len - 1] = '\n';
 			m->dir[i][len] = '\0';
 		}
-		else /* if (i > 0) */
+		else
 			while (j < m->width)
+			{
 				m->dir[i][j++] = ' ';
+				printf("%c", m->dir[i][j]);
+			}
 		i++;
 		free(line);
 		line = get_next_line(fd);
 	}
+	printf("\n");
 }
 
 int	map_check(t_map *m)
@@ -195,7 +201,7 @@ int	map_check(t_map *m)
 	int	i;
 	int	j;
 
-	i = m->line_count;
+	i = m->line_count + 1;
 	while (i < m->height)
 	{
 		j = 0;
@@ -213,16 +219,14 @@ int	map_check(t_map *m)
 	return (0);
 }
 
-int	dir_check(t_map *m) //direction in struct
+int	dir_check(t_map *m)
 {
 	int	i;
 	int	j;
 	int	n;
 
-	i = m->line_count - 1;
+	i = m->line_count;
 	n = 0;
-	printf("height: %d\n", m->height);
-	printf("width: %d\n", m->width);
 	while (++i < m->height)
 	{
 		j = -1;
@@ -238,14 +242,14 @@ int	dir_check(t_map *m) //direction in struct
 			}
 		}
 	}
-	printf("n: %d\n", n);
-	printf("i: %d\n", i);
-	printf("j: %d\n", j);
 	if (n != 1)
 	{
 		printf ("Error: Please use exactly one spawn point.\n");
 		return (1);
 	}
+	printf("player x: %f\n", m->player.pos.x);
+	printf("player y: %f\n", m->player.pos.y);
+	printf("player stand: %c\n", m->player.stand);
 	return (0);
 }
 
@@ -254,12 +258,13 @@ int	space_check(t_map *m) //0 in line
 	int	i;
 	int	j;
 
-	i = m->line_count;
+	i = m->line_count + 1;
 	while (i < m->height)
 	{
 		j = 0;
 		while (j < m->width)
 		{
+			printf("dir i: %d, j: %d\n", i, j);
 			if (m->dir[i][j] == '0' || m->dir[i][j] == 'N' ||
 				m->dir[i][j] == 'E' || m->dir[i][j] == 'S' ||
 				m->dir[i][j] == 'W')
@@ -281,13 +286,13 @@ int	map_validation(t_map *m, int fd, char *file)
 
 	tmp = open(file, O_RDONLY);
 	map_dir(m, fd);
-	// space_add(&(m->dir[0]), 0, m->width);
+	// space_add(m, &(m->dir[0]), 0, m->width);
 	map_fill(m, tmp);
+	// space_add(m, &(m->dir[m->height - 1]), 0, m->width);
 	close(tmp);
 	if (map_check(m) || dir_check(m) || space_check(m))
 	{
 		printf("Error: Map not valid.\n");
-		free_string(m->dir);
 		return (1);
 	}
 	//initialize stuff
@@ -322,16 +327,16 @@ static int	dirtex_check(char *line, int i)
 static int	srctex_check(char *src)
 {
 	if (!read_check(src))
-		return (printf("not opened\n"), 0);
+		return (0);
 	return (1);
 }
 
 static int	line_check(char **split, int i)
 {
 	if (!dirtex_check(split[0], i))
-		return (printf("dirtex\n"), 0);
+		return (0);
 	if (!srctex_check(split[1]))
-		return (printf("srctex\n"), 0);
+		return (0);
 	return (1);
 }
 
@@ -367,6 +372,7 @@ int	wrong_texture(t_map *m, int fd)
 
 	i = -1;
 	n = 1;
+	m->line_count = 0;
 	while (++i <= 3 && n)
 	{
 		line = get_next_line(fd);
@@ -381,30 +387,19 @@ int	wrong_texture(t_map *m, int fd)
 	return (cond_check(i, n));
 }
 
-// static int	texture_check(t_map *m, int fd, char *file)
-// {
-// 	int	i;
-// 	int	tmp;
+static int	texture_check(t_map *m, int fd, char *file)
+{
+	int	i;
+	int	tmp;
 
-// 	i = -1;
-// 	m->line_count = 0;
-// 	m->tex_count = 0;
-// 	tmp = open(file, O_RDONLY);
-// 	while (wrong_texture(m, tmp))
-// 		m->tex_count++;
-// 	close(tmp);
-// 	printf("texcount: %d\n", m->tex_count);
-// 	// if (m->tex_count == 0)
-// 	// {
-// 	// 	while (!wrong_texture(m, tmp, 1))
-// 	// 		m->tex_count++;
-// 	// 	return (1);
-// 	// }
-// 	// m->line_count = 0;
-// 	// while (++i < m->tex_count)
-// 	// 	wrong_texture(m, fd, 1);
-// 	return (0);
-// }
+	i = -1;
+	m->tex_count = 0;
+	tmp = open(file, O_RDONLY);
+	while (wrong_texture(m, tmp))
+		m->tex_count++;
+	close(tmp);
+	return (0);
+}
 
 int	col_comma_check(char *line)
 {
@@ -557,16 +552,20 @@ char	**cub_split(char *line)
 
 	i = 0;
 	j = 0;
-	n = 0;
 	split = malloc(sizeof(char *) * get_size(line, 0, 2) + 1);
 	while (i < get_size(line, 0, 2))
 	{
+		n = 0;
 		len = get_size(line, j, 1);
 		while (line[j] == ' ')
 			j++;
 		split[i] = malloc(sizeof(char) * len + 1);
 		while (n < len)
+		{
+			if (line[j] == '\n')
+				break ;
 			split[i][n++] = line[j++];
+		}
 		split[i][n] = '\0';
 		i++;
 	}
@@ -584,7 +583,6 @@ static int	col_format_check(char *line, int i)
 		return (0);
 	split = cub_split(line);
 	n = split_count(split);
-	printf("n form: %d\n", n);
 	if (n == 0)
 		return (0);
 	if (!cf_check(split, n, i))
@@ -609,15 +607,12 @@ int	color_check(t_map *m, int fd)
 		if (!line)
 			break ;
 		m->line_count++;
-		// printf("line: %s\n", line);
 		if (!no_content(line))
 			n = col_format_check(line, i++);
 		free(line);
 		if (i > 1 || !n)
 			break ;
 	}
-	printf("i: %d\n", i);
-	printf("n: %d\n", n);
 	if (i < 2 || !n)
 	{
 		printf("Error: Color input wrong.\n");
@@ -634,14 +629,14 @@ static void	tex_store(t_map *m, int fd)
 
 	i = 0;
 	m->tex = malloc((m->tex_count) * sizeof(char *));
-	while (i < m->tex_count)
+	while (i < m->tex_count - 1)
 	{
 		line = get_next_line(fd);
 		if (!line)
 			break ;
 		tmp = ft_split(line, ' ');
 		if (!no_content(line))
-			m->tex[i++] = *ft_strdup(tmp[1]);
+			m->tex[i++] = ft_strdup(tmp[1]);
 		free_string(tmp);
 		free(line);
 	}
@@ -661,7 +656,7 @@ int	rgb_con(char *r, char *g, char *b)
 	return (hex);
 }
 
-static void	col_store(t_map *m, int fd) //segfault?
+static void	col_store(t_map *m, int fd)
 {
 	int		i;
 	int		c;
@@ -698,12 +693,7 @@ int	parser(t_map *m, char *file)
 	fd = open(file, O_RDONLY);
  	if (fd == -1)
 		return (printf("Error: Opening file.\n"), 1);
-	if (!wrong_texture(m, fd))
-	{
-		close(fd);
-		return (1);
-	}
-	if (color_check(m, fd))
+	if (!wrong_texture(m, fd) || color_check(m, fd))
 	{
 		close(fd);
 		return (1);
@@ -716,7 +706,7 @@ int	parser(t_map *m, char *file)
 	close(fd);
 	fd = open(file, O_RDONLY);
 	tex_store(m, fd);
-	// col_store(m, fd);
+	col_store(m, fd);
 	close(fd);
 	return (0);
 }
