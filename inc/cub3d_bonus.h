@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 01:00:44 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/17 16:43:29 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/19 19:41:27 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ typedef struct s_sprite
 	t_vec	pos;
 	int		frame_count;
 	int		**pixels
-}
+}	t_sprite;
 
 typedef struct s_mlxinfo
 {

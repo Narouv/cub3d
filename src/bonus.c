@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/15 18:01:11 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/17 16:48:01 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/19 19:29:35 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,7 @@ int	main(void)
 	init_textures(game);
 	mlx_set_cursor_mode(mlx, MLX_MOUSE_HIDDEN);
 	mlx_image_to_window(mlx, game->img, 0, 0);
-	mlx_loop_hook(mlx, ft_controls_bonus, game);
+	mlx_loop_hook(mlx, ft_controls, game);
 	// mlx_loop_hook(mlx, mouse_rot, game);
 	mlx_cursor_hook(mlx, (mlx_cursorfunc)mouse_rot, game);
 	mlx_loop(mlx);

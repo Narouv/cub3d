@@ -6,52 +6,42 @@
 /*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 00:58:05 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/17 16:55:50 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/19 21:43:43 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/cub3d.h"
-#define MAP_WIDTH 24
-#define MAP_HEIGHT 24
-
-char	map[MAP_WIDTH][MAP_HEIGHT] = { 
-{ '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1' },
-{ '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1', '0', '0', '0', '0', '1', '0', '1', '0', '1', '0', '0', '0', '1' },
-{ '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1' },
-{ '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '0', '0', '0', '0', '0', '1', '1', '0', '1', '1', '0', '0', '0', '0', '1', '0', '1', '0', '1', '0', '0', '0', '1' },
-{ '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '1', '0', '1', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '1', '0', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '1', '0', '1', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '1', '0', '1', '1', '1', '1', '1', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-{ '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1' }
-};
 
 void	init_player(t_player *player)
 {
-	// east = viewdir x: 0 y: 1, plane x: 0.66 y: 0
-	// south = viewdir x: 1 y: 0, plane x: 0 y: -0.66
-	// west = viewdir x: 0 y: -1, plane x: -0.66 y: 0
-	player->pos.x = 5;
-	player->pos.y = 5;
-	player->viewdir.x = -1;
-	player->viewdir.y = 0;
-	player->plane.x = 0;
-	player->plane.y = 0.66;
+	if (player->stand == 'N')
+	{
+		player->viewdir.x = -1;
+		player->viewdir.y = 0;
+		player->plane.x = 0;
+		player->plane.y = 0.66;
+	}
+	else if (player->stand == 'W')
+	{
+		player->viewdir.x = 0;
+		player->viewdir.y = 1;
+		player->plane.x = 0.66;
+		player->plane.y = 0;
+	}
+	else if (player->stand == 'S')
+	{
+		player->viewdir.x = 1;
+		player->viewdir.y = 0;
+		player->plane.x = 0;
+		player->plane.y = -0.66;
+	}
+	else
+	{
+		player->viewdir.x = 0;
+		player->viewdir.y = -1;
+		player->plane.x = -0.66;
+		player->plane.y = 0;
+	}
 }
 
 void	init_ray(t_ray *ray)
@@ -72,6 +62,7 @@ void	init_game(t_mlxinfo *game)
 	game->time = 0;
 	game->str_update_time = 0;
 	game->old_time = 0;
+	game->map = ft_calloc(1, sizeof(t_map));
 }
 
 // only works for square textures (same width and height)
@@ -104,124 +95,70 @@ int	*get_pixel_data(char *img_path)
 	return (txt_arr);
 }
 
-void	ray_direction(t_ray *ray, t_player *player)
+// t_veci	wall = x -> wall start, y -> wall end
+t_veci	calc_wall_height(int *wall_height, double ray_len)
 {
-	if (ray->angle.x < 0)
-	{
-		ray->step_dir.x = -1;
-		ray->side_dist.x
-			= (player->pos.x - ray->map_pos.x) * ray->delta_dist.x;
-	}
-	else
-	{
-		ray->step_dir.x = 1;
-		ray->side_dist.x
-			= (ray->map_pos.x + 1.0 - player->pos.x) * ray->delta_dist.x;
-	}
-	if (ray->angle.y < 0)
-	{
-		ray->step_dir.y = -1;
-		ray->side_dist.y
-			= (player->pos.y - ray->map_pos.y) * ray->delta_dist.y;
-	}
-	else
-	{
-		ray->step_dir.y = 1;
-		ray->side_dist.y
-			= (ray->map_pos.y + 1.0 - player->pos.y) * ray->delta_dist.y;
-	}
+	t_veci	wall;
+
+	*wall_height = (int)(HEIGHT / ray_len);
+	wall.x = (-*wall_height / 2) + (HEIGHT / 2);
+	if (wall.x < 0)
+		wall.x = 0;
+	wall.y = (*wall_height / 2) + (HEIGHT / 2);
+	if (wall.y >= HEIGHT)
+		wall.y = HEIGHT - 1;
+	return wall;
 }
 
-void	ray_length(t_ray *ray)
+void	draw_pixel_column(mlx_image_t *img, int x, t_veci wall, t_texture texture)
 {
-	int	hit;
+	int	y;
 
-	hit = 0;
-	while (!hit)
+	y = 0;
+	while (y < HEIGHT)
 	{
-		if (ray->side_dist.x < ray->side_dist.y)
+		if (y < wall.x)
+			mlx_put_pixel(img, x, y, 0x520575FF);
+		else if (y >= wall.x && y < wall.y)
 		{
-			ray->side_dist.x += ray->delta_dist.x;
-			ray->map_pos.x += ray->step_dir.x;
-			ray->side = 0;
+			texture.color
+				= texture.pixels[(TEX_HEIGHT * texture.x + (int)texture.y)];
+			mlx_put_pixel(img, x, y, texture.color);
+			texture.y += texture.tex_step;
 		}
 		else
-		{
-			ray->side_dist.y += ray->delta_dist.y;
-			ray->map_pos.y += ray->step_dir.y;
-			ray->side = 1;
-		}
-		if (map[ray->map_pos.x][ray->map_pos.y] == '1')
-			hit = 1;
+			mlx_put_pixel(img, x, y, 0x32a852FF);
+		y++;
 	}
-	if (!ray->side)
-		ray->length = (ray->side_dist.x - ray->delta_dist.x);
-	else
-		ray->length = (ray->side_dist.y - ray->delta_dist.y);
 }
 
-void	update_ray(t_ray *ray, t_player *player, double camera)
+// t_veci	wall = x -> wall start, y -> wall end
+void	calc_pixel_column(t_mlxinfo *game, int x, t_texture *texture)
 {
-	ray->angle.x = player->viewdir.x + player->plane.x * camera;
-	ray->angle.y = player->viewdir.y + player->plane.y * camera;
-	ray->delta_dist.x = fabs(1 / ray->angle.x);
-	ray->delta_dist.y = fabs(1 / ray->angle.y);
-	ray->map_pos.x = (int)player->pos.x;
-	ray->map_pos.y = (int)player->pos.y;
-}
-
-void	draw_pixel_column(t_mlxinfo *game, int x, t_texture *texture)
-{
-	int			y;
 	double		wall_hit;
-	int			start; // remove
-	int			end; // remove
+	t_veci		wall;
 	t_ray		ray;
 	t_player	player;
 
 	ray = game->ray;
 	player = game->player;
-	texture->wall_height = (int)(HEIGHT / game->ray.length);
-	start = (-texture->wall_height / 2) + (HEIGHT / 2);
-	if (start < 0)
-		start = 0;
-	end = (texture->wall_height / 2) + (HEIGHT / 2);
-	if (end >= HEIGHT)
-		end = HEIGHT - 1;
+	wall = calc_wall_height(&texture->wall_height, game->ray.length);
 	if (ray.side == 0)
 		wall_hit = player.pos.y + game->ray.length * ray.angle.y;
 	else
 		wall_hit = player.pos.x + game->ray.length * ray.angle.x;
 	wall_hit -= floor((wall_hit));
-	//x coordinate on the texture
 	texture->x = wall_hit * (double)TEX_WIDTH;
 	if (ray.side == 0 && ray.angle.x > 0)
 		texture->x = TEX_WIDTH - texture->x - 1;
 	if (ray.side == 1 && ray.angle.y < 0)
 		texture->x = TEX_WIDTH - texture->x - 1;
-	// How much to increase the texture coordinate per screen pixel
 	texture->tex_step = 1.0 * (double)TEX_HEIGHT / texture->wall_height;
-	// Starting texture coordinate
 	texture->y
-		= ((double)start - (double)HEIGHT
+		= ((double)wall.x - (double)HEIGHT
 			/ 2 + (double)texture->wall_height / 2)
 		* texture->tex_step;
-	y = 0;
-	while (y < HEIGHT)
-	{
-		if (y < start)
-			mlx_put_pixel(game->img, x, y, 0x520575FF);
-		else if (y >= start && y < end)
-		{
-			texture->color
-				= texture->pixels[(TEX_HEIGHT * texture->x + (int)texture->y)];
-			mlx_put_pixel(game->img, x, y, texture->color);
-			texture->y += texture->tex_step;
-		}
-		else
-			mlx_put_pixel(game->img, x, y, 0x32a852FF);
-		y++;
-	}
+	draw_pixel_column(game->img, x, wall, *texture);
 }
 
 int	get_texture_side(t_ray *ray)
@@ -252,8 +189,8 @@ void	cast_rays(t_mlxinfo *game)
 		camera = 2 * x / (double)WIDTH - 1;
 		update_ray(ray, player, camera);
 		ray_direction(ray, player);
-		ray_length(ray);
-		draw_pixel_column(game, x, game->texture[get_texture_side(ray)]);
+		ray_length(ray, game->map);
+		calc_pixel_column(game, x, &game->texture[get_texture_side(ray)]);
 		x++;
 	}
 }
@@ -278,87 +215,55 @@ void	clear_screen(void *param)
 	}
 }
 
-void	rot_fov(t_mlxinfo *game, double rot_val)
-{
-	double		odx;
-	double		ody;
-	double		rs;
-	t_player	p;
-
-	p = game->player;
-	rs = (game->time - game->old_time) * rot_val;
-	odx = p.viewdir.x;
-	p.viewdir.x = p.viewdir.x * cos(rs) - p.viewdir.y * sin(rs);
-	p.viewdir.y = odx * sin(rs) + p.viewdir.y * cos(rs);
-	ody = p.plane.x;
-	p.plane.x = p.plane.x * cos(rs) - p.plane.y * sin(rs);
-	p.plane.y = ody * sin(rs) + p.plane.y * cos(rs);
-}
-
-void	move_player(t_mlxinfo *game, t_vec axis, double val)
-{
-	double	move_speed;
-
-	move_speed = (game->time - game->old_time) * val;
-	game->player.pos.x += axis.x * move_speed;
-	game->player.pos.y += axis.y * move_speed;
-}
-
-void	ft_controls(void *g)
-{
-	t_mlxinfo	*game;
-
-	game = g;
-	game->old_time = game->time;
-	game->time = mlx_get_time();
-	clear_screen(game->img);
-	cast_rays(game);
-	if (mlx_is_key_down(game->mlx, MLX_KEY_W))
-		move_player(game, game->player.viewdir, 5.0);
-	if (mlx_is_key_down(game->mlx, MLX_KEY_S))
-		move_player(game, game->player.viewdir, -5.0);
-	if (mlx_is_key_down(game->mlx, MLX_KEY_D))
-		move_player(game, game->player.plane, 5.0);
-	if (mlx_is_key_down(game->mlx, MLX_KEY_A))
-		move_player(game, game->player.plane, -5.0);
-	if (mlx_is_key_down(game->mlx, MLX_KEY_RIGHT))
-		rot_fov(game, -3.0);
-	if (mlx_is_key_down(game->mlx, MLX_KEY_LEFT))
-		rot_fov(game, 3.0);
-	if (mlx_is_key_down(game->mlx, MLX_KEY_ESCAPE))
-		mlx_close_window(game->mlx);
-}
-
 void	init_textures(t_mlxinfo *game)
 {
 	game->texture = malloc(4 * sizeof(t_texture));
-	game->texture[0] = malloc(sizeof(t_texture));
-	game->texture[1] = malloc(sizeof(t_texture));
-	game->texture[2] = malloc(sizeof(t_texture));
-	game->texture[3] = malloc(sizeof(t_texture));
-	game->texture[0]->pixels = get_pixel_data("./assets/mc_cave.png"/*game->map.north*/);
-	game->texture[1]->pixels = get_pixel_data("./assets/mc_desert.png"/*game->map.south*/);
-	game->texture[2]->pixels = get_pixel_data("./assets/mc_house.png"/*game->map.east*/);
-	game->texture[3]->pixels = get_pixel_data("./assets/mc_nether.png"/*game->map.west*/);
+	game->texture[0].pixels = get_pixel_data(game->map->tex[0]);
+	game->texture[1].pixels = get_pixel_data(game->map->tex[1]);
+	game->texture[2].pixels = get_pixel_data(game->map->tex[2]);
+	game->texture[3].pixels = get_pixel_data(game->map->tex[3]);
 }
 
-int	main(void)
+// void	cleanup(t_mlxinfo *game)
+// {
+// 	free(&game);
+// }
+
+void	init_map(t_map *map, t_player *player)
+{
+	map->player = player;
+}
+
+int	main(int argc, char **argv)
 {
 	t_mlxinfo	*game;
 	mlx_t		*mlx;
+	char *map_file;
 
+	if (argc != 2) {
+		printf("Usage: %s <map_file>\n", argv[0]);
+		return (1);
+	}
+	map_file = argv[1];
 	game = malloc(sizeof(t_mlxinfo));
 	init_game(game);
+	init_map(game->map, &game->player);
+	init_player(&game->player);
+	init_ray(&game->ray);
+	if (parser(game->map, map_file) == 0) {
+		printf("Map parsing successful!\n");
+	} else {
+		printf("Map parsing failed!\n");
+	}
 	game->mlx = mlx_init(WIDTH, HEIGHT, "cub3d", true);
 	mlx = game->mlx;
 	game->img = mlx_new_image(mlx, WIDTH, HEIGHT);
-	init_player(&game->player);
-	init_ray(&game->ray);
 	init_textures(game);
 	mlx_image_to_window(mlx, game->img, 0, 0);
 	mlx_loop_hook(mlx, ft_controls, game);
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
+	// cleanup(game);
 	system("leaks cub3d");
 	return (0);
 }
