@@ -3,45 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/13 13:15:57 by rhortens          #+#    #+#             */
-/*   Updated: 2023/10/19 21:41:16 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 13:02:31 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/cub3d.h"
-
-int	color_check(t_map *m, int fd);
-
-int	ft_strcmp(char *str1, char *str2)
-{
-	int	i;
-
-	i = 0;
-	if (ft_strlen(str1) != ft_strlen(str2))
-		return (0);
-	while (str1[i])
-	{
-		if (str1[i] != str2[i])
-			return (0);
-		i++;
-	}
-	return (1);
-}
-
-void	free_string(char **str)
-{
-	int	i;
-
-	i = 0;
-	if (!str)
-		return ;
-	while (str[i])
-		free(str[i++]);
-	free(str);
-}
-
 int	filename_error(char *file, char *c)
 {
 	int	i;
@@ -67,8 +36,6 @@ int	read_check(char *file)
 {
 	int	fd;
 
-	if (file[ft_strlen(file) - 1] == '\n')
-		file = ft_substr(file, 0, ft_strlen(file) - 1);//maybe leaks wegen ft_substr
 	fd = open(file, O_RDONLY);
 	if (fd < 0)
 	{
@@ -89,130 +56,222 @@ int	file_check(char *file)
 	return (0);
 }
 
-static void	map_dir(t_map *m, int fd)
-{
-	int		i;
-	char	*line;
-
-	i = 0;
-	m->height = m->line_count + 2;
-	m->width = 0;
-	while (1)
-	{
-		line = get_next_line(fd);
-		if (!line)
-			break ;
-		if (ft_strlen(line) > (size_t)m->width)
-			m->width = ft_strlen(line);
-		free(line);
-		m->height++;
-	}
-	m->width += 2;
-	m->dir = ft_calloc(m->height, sizeof(char *));
-	while (i < m->height)
-	{
-		m->dir[i] = ft_calloc(m->width + 1, sizeof(char));
-		m->dir[i++][m->width] = '\0';
-	}
-}
-
-int	no_content(char *str)
+void	free_string(char **str)
 {
 	int	i;
-	int	j;
 
 	i = 0;
-	j = ft_strlen(str);
-	while (str[i] && (str[i] == ' ' || str[i] == '\t' || str[i] == '\n'))
-		i++;
-	if (i == j)
+	if (!str)
+		return ;
+	while (str[i])
+		free(str[i++]);
+	free(str);
+}
+
+int	rgb_con(char *r, char *g, char *b)
+{
+	int	red;
+	int	gre;
+	int	blu;
+	int	hex;
+
+	red = ft_atoi(r);
+	gre = ft_atoi(g);
+	blu = ft_atoi(b);
+	if (red > 255 || gre > 255 || blu > 255)
+		return (1);
+	hex = (red << 24) | (gre << 16) | (blu << 8) | 0xff;
+	return (hex);
+}
+
+char	*skip_empty_lines(int fd, t_map *m)
+{
+	char	*line;
+	size_t	cntr;
+
+	line = get_next_line(fd);
+	while (line)
+	{
+		cntr = 0;
+		if (!line)
+			break ;
+		while (line[cntr] == '\t' || line[cntr] == ' ')
+			cntr++;
+		if (line[cntr] == '\n')
+		{
+			free(line);
+			line = get_next_line(fd);
+			m->line_count++;
+		}
+		else
+			return (line);
+	}
+	return (NULL);
+}
+
+int	check_split(char **split)
+{
+	int	cntr;
+	int	cntr2;
+
+	cntr = 0;
+	while (split[cntr])
+	{
+		cntr2 = 0;
+		while (split[cntr][cntr2])
+		{
+			if (!ft_isdigit(split[cntr][cntr2]))
+				return (1);
+			cntr2++;
+		}
+		cntr++;
+	}
+	if (cntr > 3)
 		return (1);
 	return (0);
 }
 
-// static void	space_add(t_map *map, char **line, int i, int end)
-// {
-// 	int	len;
-// 	int	j;
-	
-// 	len = ft_strlen(*line);
-// 	j = 0;
-// 	map->dir[i][j++] = ' ';
-// 	while (*line[j - 1] != '\n')
-// 	{
-// 		map->dir[i][j] = *line[j - 1];
-// 		j++;
-// 	}
-// 	// add missing spaces
-// 	while (len < end)
-// 		map->dir[i][len++] = ' ';
-// 	// add new line at end
-// 	map->dir[i][j] = '\n';
-// }
-
-static void	map_fill(t_map *m, int fd)
+int	color(char *color_str, int *color)
 {
-	int		i;
-	int		j;
-	char	*line;
-	
-	int len;
+	char	*str;
+	char	**split;
 
-	i = 0;
-	j = 0;
-	while (j++ < m->line_count + 1)
-		line = get_next_line(fd);
+	str = ft_strtrim(color_str, "FC \t\n");
+	split = ft_split(str, ',');
+	if (check_split(split) || !split[0] || !split[1] || !split[2])
+	{
+		free(str);
+		free_string(split);
+		return (1);
+	}
+	*color = rgb_con(split[0], split[1], split[2]);
+	free(str);
+	free_string(split);
+	if (*color == 1)
+		return (1);
+	return (0);
+}
+
+int	texture(char *tex_str, char **tex_path, char *symbol, t_map *m)
+{
+	char	*str;
+	char	*set;
+
+	set = ft_strjoin(symbol, " \t\n");
+	str = ft_strtrim(tex_str, set);
+	free(set);
+	if (!read_check(str))
+	{
+		free(str);
+		return (1);
+	}
+	*tex_path = ft_strdup(str);
+	m->tex_count++;
+	return (0);
+}
+
+int	check_struct(char *line, char *str)
+{
+	free(line);
+	if (ft_strncmp(str, "F", 1) && ft_strncmp(str, "C", 1)
+		&& ft_strncmp(str, "N", 1) && ft_strncmp(str, "S", 1)
+		&& ft_strncmp(str, "E", 1) && ft_strncmp(str, "W", 1))
+	{
+		free(str);
+		return (1);
+	}
+	free(str);
+	return (0);
+}
+
+int	color_or_texture(int fd, t_map *m)
+{
+	char	*line;
+	char	*str;
+	int		ret_val;
+
+	ret_val = 0;
+	while (!ret_val && (m->tex_count != 4 || !m->f_col || !m->c_col))
+	{
+		line = skip_empty_lines(fd, m);
+		str = ft_strtrim(line, "\t \n");
+		if (!ft_strncmp(str, "F ", 2))
+			ret_val = color(str, &m->f_col);
+		else if (!ft_strncmp(str, "C ", 2))
+			ret_val = color(str, &m->c_col);
+		else if (!ft_strncmp(str, "NO ", 3))
+			ret_val = texture(str, &m->tex[0], "NO", m);
+		else if (!ft_strncmp(str, "SO ", 3))
+			ret_val = texture(str, &m->tex[1], "SO", m);
+		else if (!ft_strncmp(str, "EA ", 3))
+			ret_val = texture(str, &m->tex[2], "EA", m);
+		else if (!ft_strncmp(str, "WE ", 3))
+			ret_val = texture(str, &m->tex[3], "WE", m);
+		if (check_struct(line, str))
+			break ;
+	}
+	return (ret_val);
+}
+
+void	save_map(int fd, t_map *m)
+{
+	char	*line;
+	char	*one;
+
+	line = skip_empty_lines(fd, m);
+	m->whole_map = ft_strjoin("", line);
 	while (line)
 	{
-		if (!no_content(line))
-		{
-			len = ft_strlen(line);
-			j = 0;
-			m->dir[i][j++] = ' ';
-			while (j < len + 1)
-			{
-				m->dir[i][j] = line[j - 1];
-				printf("%c", m->dir[i][j]);
-				j++;
-			}
-			// add missing spaces
-			while (len < m->width)
-			{
-				m->dir[i][len++] = ' ';
-				printf("%c", m->dir[i][len]);
-			}
-			// add new line at end
-			m->dir[i][len - 1] = '\n';
-			m->dir[i][len] = '\0';
-		}
-		else
-			while (j < m->width)
-			{
-				m->dir[i][j++] = ' ';
-				printf("%c", m->dir[i][j]);
-			}
-		i++;
+		one = m->whole_map;
+		m->whole_map = ft_strjoin(one, line);
+		free(one);
 		free(line);
 		line = get_next_line(fd);
 	}
-	printf("\n");
 }
 
-int	map_check(t_map *m)
+int	valid_char(char c)
 {
-	int	i;
-	int	j;
+	if (c == '0' || c == 'N' || c == 'S' || c == 'E' || c == 'W' )
+	{
+		return (1);
+	}
+	return (0);
+}
 
-	i = 1;
+int	space_check(char **s, t_map *m, size_t i, size_t j)
+{
+	if (i && j && valid_char(s[i][j]))
+	{
+		if (j < ft_strlen(s[i])	&& (s[i][j + 1] == ' '
+			|| s[i][j - 1] == ' '))
+			return (1); //printf("end line\n");
+		if (i < m->height - 1 && (s[i + 1][j] == ' ' || s[i - 1][j] == ' '))
+			return (1); //printf("end line\n");
+	}
+	return (0);
+}
+
+int	check_bounds(char **s, t_map *m)
+{
+	size_t	i;
+	size_t	j;
+	
+	i = 0;
 	while (i < m->height)
 	{
 		j = 0;
 		while (j < m->width)
 		{
-			if (m->dir[i][j] != 'N' && m->dir[i][j] != 'E' &&
-				m->dir[i][j] != 'S' && m->dir[i][j] != 'W' &&
-				m->dir[i][j] != '0' && m->dir[i][j] != '1' &&
-				m->dir[i][j] != ' ' && m->dir[i][j] != '\n' && m->dir[i][j] != '\0')
+			if (!i && (s[i][j] != '1' && s[i][j] != ' '))
+				return (1); //printf("end line\n");
+			else if (i == m->height - 1 && (s[i][j] != '1' && s[i][j] != ' '))
+				return (1); //printf("end line\n");
+			else if (!j && (s[i][j] != '1' && s[i][j] != ' '))
+				return (1); //printf("end line\n");
+			else if (!s[i][j] && ft_strlen(s[i]) > j && s[i][j - 1] != '1')
+				return (1); //printf("end line\n");
+			else if (space_check(s, m, i, j))
 				return (1);
 			j++;
 		}
@@ -221,14 +280,38 @@ int	map_check(t_map *m)
 	return (0);
 }
 
-int	dir_check(t_map *m)
+char	**get_dimensions(t_map *m)
 {
-	int	i;
-	int	j;
-	int	n;
+	char	**split;
+	size_t	cntr;
+	size_t	wide;
+
+	cntr = 0;
+	split = ft_split(m->whole_map, '\n');
+	while (split[cntr])
+	{
+		wide = ft_strlen(split[cntr]);
+		if (wide > m->width)
+			m->width = wide;
+		cntr++;
+	}
+	m->height = cntr;
+	m->dir = ft_calloc(m->height, sizeof(char *));
+	cntr = 0;
+	while (cntr < m->height)
+	{
+		m->dir[cntr] = ft_calloc(m->width + 1, sizeof(char));
+		cntr++;
+	}
+	return (split);
+}
+
+int	get_player_pos(t_map *m)
+{
+	size_t	i;
+	size_t	j;
 
 	i = 0;
-	n = 0;
 	while (++i < m->height)
 	{
 		j = -1;
@@ -240,475 +323,100 @@ int	dir_check(t_map *m)
 				m->player->stand = m->dir[i][j];
 				m->player->pos.x = (double)j + 0.5;
 				m->player->pos.y = (double)i + 0.5;
-				n++;
+				m->dir[i][j] = '0';
+				m->p_count++;
 			}
 		}
 	}
-	if (n != 1)
-	{
-		printf ("Error: Please use exactly one spawn point.\n");
+	if (m->p_count > 1)
 		return (1);
-	}
 	return (0);
 }
 
-int	space_check(t_map *m) //0 in line
+void	fill_map(char **s, t_map *m)
 {
-	int	i;
-	int	j;
+	size_t	i;
+	size_t	j;
+	size_t	len;
 
-	i = 1;
-	while (i < m->height)
+	i = 0;
+	while (s[i])
 	{
 		j = 0;
+		len = ft_strlen(s[i]);
 		while (j < m->width)
 		{
-			if (m->dir[i][j] == '0' || m->dir[i][j] == 'N' ||
-				m->dir[i][j] == 'E' || m->dir[i][j] == 'S' ||
-				m->dir[i][j] == 'W')
-			{
-				if (m->dir[i + 1][j] == ' ' || m->dir[i - 1][j] == ' ' ||
-					m->dir[i][j + 1] == ' ' || m->dir[i][j - 1] == ' ')
-					return (1);
-			}
-			j++;
-		}
-		i++;
-	}
-	return (0);
-}
-
-int	map_validation(t_map *m, int fd, char *file)
-{
-	int	tmp;
-
-	tmp = open(file, O_RDONLY);
-	map_dir(m, fd);
-	// space_add(m, &(m->dir[0]), 0, m->width);
-	map_fill(m, tmp);
-	// space_add(m, &(m->dir[m->height - 1]), 0, m->width);
-	close(tmp);
-	if (map_check(m) || dir_check(m) || space_check(m))
-	{
-		printf("Error: Map not valid.\n");
-		return (1);
-	}
-	//initialize stuff
-	return (0);
-}
-
-int	cond_check(int i, int n)
-{
-	if (i < 4 || !n)
-	{
-		printf("Error: Wrong texture input.\n");
-		return (0);
-	}
-	return (1);
-}
-
-static int	dirtex_check(char *line, int i)
-{
-	if (i == 0 && ft_strcmp(line, "NO"))
-		return (1);
-	else if (i == 1 && ft_strcmp(line, "SO"))
-		return (1);
-	else if (i == 2 && ft_strcmp(line, "WE"))
-		return (1);
-	else if (i == 3 && ft_strcmp(line, "EA"))
-		return (1);
-	else
-		printf("Error: Texture not correct.\n");
-	return (0);
-}
-
-static int	srctex_check(char *src)
-{
-	if (!read_check(src))
-		return (0);
-	return (1);
-}
-
-static int	line_check(char **split, int i)
-{
-	if (!dirtex_check(split[0], i))
-		return (0);
-	if (!srctex_check(split[1]))
-		return (0);
-	return (1);
-}
-
-static int	format_check(char *line, int i)
-{
-	int		j;
-	int		n;
-	char	**split;
-
-	j = 0;
-	n = 0;
-	split = ft_split(line, ' ');
-	while (split[j])
-		j++;
-	if (j != 2)
-	{
-		if (j != 0)
-			free_string(split);
-		return (0);
-	}
-	n = line_check(split, i);
-	free_string(split);
-	if (!n)
-		return (0);
-	return (1);
-}
-
-int	wrong_texture(t_map *m, int fd)
-{
-	int		i;
-	int		n;
-	char	*line;
-
-	i = -1;
-	n = 1;
-	m->line_count = 0;
-	m->tex_count = 0;
-	while (++i <= 3 && n)
-	{
-		line = get_next_line(fd);
-		if (!line)
-			break ;
-		m->line_count++;
-		if (!no_content(line))
-			n = format_check(line, i);
-		m->tex_count++; 
-		free(line);
-	}
-	return (cond_check(i, n));
-}
-
-// static int	texture_check(t_map *m, char *file)
-// {
-// 	int	i;
-// 	int	tmp;
-
-// 	i = -1;
-// 	m->tex_count = 0;
-// 	tmp = open(file, O_RDONLY);
-// 	while (wrong_texture(m, tmp))
-// 		m->tex_count++;
-// 	close(tmp);
-// 	return (0);
-// }
-
-int	col_comma_check(char *line)
-{
-	int	i;
-	int	n;
-
-	i = 0;
-	n = 0;
-	while (line[i])
-	{
-		if (line[i] == ',')
-			n++;
-		i++;
-	}
-	if (n == 2)
-		return (1);
-	return (0);
-}
-
-static int	cf_check(char **col, int i)
-{
-	if (i == 0)
-	{
-		if (ft_strcmp(col[0], "F"))
-			return (1);
-	}
-	else if (i == 1)
-	{
-		if (ft_strcmp(col[0], "C"))
-			return (1);
-	}
-	printf("Error: Ceiling/Floor color not correct.\n");
-	free_string(col);
-	return (0);
-}
-
-int	cub_digit(char *c)
-{
-	int	i;
-
-	i = 0;
-	while (c[i])
-	{
-		if (!ft_isdigit(c[i]))
-			return (0);
-		i++;
-	}
-	return (1);
-}
-
-static int	rgb_check(char **num, int n)
-{
-	int	i;
-	int	tmp;
-	int	count;
-
-	i = 0;
-	tmp = 0;
-	count = 0;
-	if (cub_digit(num[1]) && cub_digit(num[3]) && cub_digit(num[5]))
-	{
-		while (i < n)
-		{
-			if (i % 2 == 1)
-			{
-				tmp = ft_atoi(num[i]);
-				if (tmp > -1 && tmp < 256)
-					count++;
-			}
-			i++;
-		}
-		if (count == 3)
-			return (1);
-	}
-	free_string(num);
-	return (printf("Error: RGB colors wrong.\n"), 0);
-}
-
-int	split_count(char **split)
-{
-	int	i;
-
-	i = 0;
-	while (split[i])
-		i++;
-	if (i != 6)
-		return (free_string(split), 0);
-	return (i);
-}
-
-static int	cosp_check(char cosp, int *len, int *n, int j)
-{
-	if (cosp == ',')
-	{
-		if (*len > 0)
-			*n += 1;
-		*n += 1;
-		if (j == 1 && *len > 0)
-			return (*len);
-		if (j == 1 && *len == 0)
-			return (1);
-		*len = 0;
-	}
-	else
-	{
-		if (*len > 0)
-			*n += 1;
-		if (j == 1 && *len > 0)
-			return (*len);
-		*len = 0;
-	}
-	return (0);
-}
-
-int	get_size(char *line, int i, int j)
-{
-	int	n;
-	int	len;
-	int	tmp;
-
-	n = 0;
-	len = 0;
-	tmp = 0;
-	while (line[i])
-	{
-		if (line[i] != ' ' && line[i] != ',')
-			len ++;
-		else
-			tmp = cosp_check(line[i], &len, &n, j);
-		if (tmp > 0)
-			return (tmp);
-		i++;
-	}
-	if (len > 0)
-		n++;
-	if (j == 1 && len > 0)
-		return (len);
-	if (j == 1 && len == 0 && line[i - 1] == ',')
-		return (1);
-	return (n);
-}
-
-char	**cub_split(char *line)
-{
-	int		i;
-	int		j;
-	int		n;
-	int		len;
-	char	**split;
-
-	i = 0;
-	j = 0;
-	split = ft_calloc(sizeof(char *), get_size(line, 0, 2) + 8);
-	while (i < get_size(line, 0, 2))
-	{
-		n = 0;
-		len = get_size(line, j, 1);
-		while (line[j] == ' ')
-			j++;
-		split[i] = ft_calloc(sizeof(char), len + 1);
-		while (n < len)
-		{
-			if (line[j] == '\n')
-				break ;
-			split[i][n++] = line[j++];
-		}
-		split[i][n] = '\0';
-		i++;
-	}
-	split[i] = NULL;
-	i = 0;
-	return (split);
-}
-
-static int	col_format_check(char *line, int i)
-{
-	int		n;
-	char	**split;
-
-	if (!col_comma_check(line))
-		return (0);
-	split = cub_split(line);
-	n = split_count(split);
-	if (n == 0)
-		return (0);
-	if (!cf_check(split, i))
-		return (0);
-	if (!rgb_check(split, n))
-		return (0);
-	free_string(split);
-	return (1);
-}
-
-int	color_check(t_map *m, int fd)
-{
-	int		i;
-	int		n;
-	char	*line;
-
-	i = 0;
-	n = 1;
-	while (1)
-	{
-		line = get_next_line(fd);
-		if (!line)
-			break ;
-		m->line_count++;
-		if (!no_content(line))
-			n = col_format_check(line, i++);
-		free(line);
-		if (i > 1 || !n)
-			break ;
-	}
-	if (i < 2 || !n)
-	{
-		printf("Error: Color input wrong.\n");
-		return (1);
-	}
-	return (0);
-}
-
-static void	tex_store(t_map *m, int fd)
-{
-	int		i;
-	char	**tmp;
-	char	*line;
-
-	i = 0;
-	m->tex = malloc((m->tex_count) * sizeof(char *));
-	while (i < m->tex_count)
-	{
-		line = get_next_line(fd);
-		if (!line)
-			break ;
-		tmp = ft_split(line, ' ');
-		if (!no_content(line))
-		{
-			printf("%s\n", tmp[1]);
-			m->tex[i++] = ft_strdup(ft_strtrim(tmp[1], "\n"));
-		}
-		free_string(tmp);
-		free(line);
-	}
-}
-
-int	rgb_con(char *r, char *g, char *b)
-{
-	int	red;
-	int	green;
-	int	blue;
-	int	hex;
-
-	red = ft_atoi(r);
-	green = ft_atoi(g);
-	blue = ft_atoi(b);
-	hex = (red << 24) | (green << 16) | (blue << 8) | 0xff;
-	return (hex);
-}
-
-static void	col_store(t_map *m, int fd)
-{
-	int		i;
-	int		c;
-	char	**tmp;
-	char	*line;
-
-	i = 0;
-	while (i < 2)
-	{
-		line = get_next_line(fd);
-		if (!line)
-			break ;
-		tmp = cub_split(line);
-		if (!no_content(line))
-		{
-			c = rgb_con(tmp[1], tmp[3], tmp[5]);
-			if (i == 0)
-				m->f_col = c;
+			if (j >= len)
+				m->dir[i][j] = ' ';
 			else
-				m->c_col = c;
-			i++;
+				m->dir[i][j] = s[i][j];
+			j++;
 		}
-		free_string(tmp);
-		free(line);
+		m->dir[i][j] = '\0';
+		i++;
 	}
+}
+
+int	get_map(int fd, t_map *m)
+{
+	char **s;
+
+	save_map(fd, m);
+	s = get_dimensions(m);
+	fill_map(s, m);
+	if (check_bounds(m->dir, m))
+	{
+		ft_printf("invalid map\n");
+		return (1);
+	}
+	if (get_player_pos(m))
+	{
+		ft_printf("only 1 player allowed\n");
+		return (1);
+	}
+	printf("x: %f y: %f", m->player->pos.x, m->player->pos.y);
+	return (0);
+}
+
+int	diagnose(t_map *m)
+{
+	if (!m->tex[0] || !m->tex[1] || !m->tex[2] || !m->tex[3])
+	{
+		printf("missing texture\n");
+		return (1);
+	}
+	if (!m->f_col)
+	{
+		printf("missing floor color\n");
+		return (1);
+	}	
+	if (!m->c_col)
+	{
+		printf("missing ceiling color\n");
+		return (1);
+	}
+	return (0);
 }
 
 int	parser(t_map *m, char *file)
 {
-	int	fd;
+	int		fd;
 
 	if (file_check(file))
 		return (1);
 	fd = open(file, O_RDONLY);
- 	if (fd == -1)
+	if (fd == -1)
 		return (printf("Error: Opening file.\n"), 1);
-	if (!wrong_texture(m, fd) || color_check(m, fd))
+	if (color_or_texture(fd, m) || diagnose(m))
 	{
 		close(fd);
 		return (1);
 	}
-	if (map_validation(m, fd, file))
+	if (get_map(fd, m))
 	{
 		close(fd);
 		return (1);
 	}
-	close(fd);
-	fd = open(file, O_RDONLY);
-	tex_store(m, fd);
-	col_store(m, fd);
 	close(fd);
 	return (0);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   control.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/17 17:01:07 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/19 21:24:01 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 13:37:36 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,13 @@ void	rot_fov(t_mlxinfo *game, double rot_val)
 
 void	move_player(t_mlxinfo *game, t_vec axis, double val)
 {
-	double	move_speed;
+	double		move_speed;
 
 	move_speed = (game->time - game->old_time) * val;
-	game->player.pos.x += axis.x * move_speed;
-	game->player.pos.y += axis.y * move_speed;
+	if(game->map->dir[(int)game->player.pos.y][(int)(game->player.pos.x + (axis.x * move_speed))] == '0')
+		game->player.pos.x += axis.x * move_speed;
+	if(game->map->dir[(int)(game->player.pos.y + (axis.y * move_speed))][(int)game->player.pos.x] == '0')
+		game->player.pos.y += axis.y * move_speed;
 }
 
 void	put_square(mlx_image_t *img, int x, int y, int color)
@@ -51,20 +53,24 @@ void	put_square(mlx_image_t *img, int x, int y, int color)
 				mlx_put_pixel(img, x+xs, y+ys, color);
 }
 
-void minimap(void *i, char **map)
+void minimap(t_mlxinfo *game)
 {
-	mlx_image_t *img = i;
 	int scale = 10; // replace with some sort of scale in the struct
-	for (int y = 0; y < MAP_HEIGHT; y++)
+	for (size_t y = 0; y < game->map->height; y++)
 	{
-		for (int x = 0; x < MAP_WIDTH; x++)
+		for (size_t x = 0; x < game->map->width; x++)
 		{
-			if (map[y][x] == '1')
-				put_square(img, x*scale, y*scale, 0xFFFFFFFF);
-			else if (map[y][x] == '0')
-				put_square(img, x*scale, y*scale, 0xCCCCCCFF);
+			if (game->map->dir[y][x] == '1')
+				put_square(game->img, x*scale, y*scale, 0xFFFFFFFF);
+			else if (game->map->dir[y][x] == '0')
+			{
+				if (x == (size_t)game->player.pos.x && y == (size_t)game->player.pos.y)
+					put_square(game->img, x*scale, y*scale, 0xCC0000FF);
+				else
+					put_square(game->img, x*scale, y*scale, 0xCCCCCCFF);
+			}
 			else
-				put_square(img, x*scale, y*scale, 0x0);
+				put_square(game->img, x*scale, y*scale, 0x0);
 		}	
 	}
 }
@@ -78,11 +84,11 @@ void	ft_controls(void *g)
 	game->time = mlx_get_time();
 	clear_screen(game->img);
 	cast_rays(game);
-	minimap(game->img, game->map->dir);
+	minimap(game);
 	if (mlx_is_key_down(game->mlx, MLX_KEY_W))
-		move_player(game, game->player.viewdir, 5.0);
+		move_player(game, game->player.viewdir, 3.0);
 	if (mlx_is_key_down(game->mlx, MLX_KEY_S))
-		move_player(game, game->player.viewdir, -5.0);
+		move_player(game, game->player.viewdir, -3.0);
 	if (mlx_is_key_down(game->mlx, MLX_KEY_D))
 		move_player(game, game->player.plane, 5.0);
 	if (mlx_is_key_down(game->mlx, MLX_KEY_A))

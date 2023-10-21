@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ray.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/17 16:59:35 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/19 21:27:45 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 13:34:09 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,6 @@ void	ray_length(t_ray *ray, t_map *map)
 	hit = 0;
 	while (!hit)
 	{
-		if (ray->map_pos.x >= map->width || ray->map_pos.y >= map->height)
-			hit = 1;
 		if (ray->side_dist.x < ray->side_dist.y)
 		{
 			ray->side_dist.x += ray->delta_dist.x;
@@ -43,7 +41,6 @@ void	ray_length(t_ray *ray, t_map *map)
 			ray->map_pos.y += ray->step_dir.y;
 			ray->side = 1;
 		}
-		// put protection for outide of map
 		if (map->dir[ray->map_pos.y][ray->map_pos.x] == '1')
 			hit = 1;
 	}

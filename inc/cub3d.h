@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 01:00:44 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/19 21:27:53 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 12:51:11 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,6 @@
 # define HEIGHT 480
 # define TEX_WIDTH 256
 # define TEX_HEIGHT 256
-# define MAP_WIDTH 24
-# define MAP_HEIGHT 24
 
 typedef struct s_veci
 {
@@ -49,12 +47,14 @@ typedef struct s_player
 
 typedef struct s_map
 {
-	int			width;
-	int			height;
+	size_t			width;
+	size_t			height;
 	char		**dir;
 	t_player	*player;
+	char		*whole_map;
 	int			line_count;
 	int			tex_count;
+	int			p_count;
 	char		**tex;
 	int			f_col;
 	int			c_col;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 00:58:05 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/19 21:43:43 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 12:53:44 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -232,6 +232,12 @@ void	init_textures(t_mlxinfo *game)
 void	init_map(t_map *map, t_player *player)
 {
 	map->player = player;
+	map->tex_count = 0;
+	map->p_count = 0;
+	map->line_count = 0;
+	map->f_col = 0;
+	map->c_col = 0;
+	map->tex = ft_calloc(4, sizeof(char *));
 }
 
 int	main(int argc, char **argv)
@@ -254,6 +260,7 @@ int	main(int argc, char **argv)
 		printf("Map parsing successful!\n");
 	} else {
 		printf("Map parsing failed!\n");
+		return (0);
 	}
 	game->mlx = mlx_init(WIDTH, HEIGHT, "cub3d", true);
 	mlx = game->mlx;
