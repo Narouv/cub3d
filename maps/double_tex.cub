@@ -1,8 +1,8 @@
-NO /assets/mc_cave.png
-NO /assets/mc_cave.png
-SO /assets/mc_house.png
-WE /assets/mc_desert.png
-EA /assets/mc_nether.png
+NO assets/mc_cave.png
+NO assets/mc_cave.png
+SO assets/mc_house.png
+WE assets/mc_desert.png
+EA assets/mc_nether.png
 
 F 148,54,0
 C 0,132,252
