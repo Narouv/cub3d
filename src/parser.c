@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/13 13:15:57 by rhortens          #+#    #+#             */
-/*   Updated: 2023/10/21 17:02:08 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 19:31:56 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ int	texture(char *tex_str, char **tex_path, char *symbol, t_map *m)
 		return (1);
 	}
 	*tex_path = ft_strdup(str);
+	free(str);
 	m->tex_count++;
 	return (0);
 }
@@ -51,14 +52,14 @@ int	color_or_texture(int fd, t_map *m)
 	int		ret_val;
 
 	ret_val = 0;
-	while (!ret_val && (m->tex_count != 4 || !m->f_col || !m->c_col))
+	while (!ret_val && (m->tex_count != 4 || !m->c_col || !m->f_col))
 	{
 		line = skip_empty_lines(fd, m);
 		str = ft_strtrim(line, "\t \n");
 		if (!ft_strncmp(str, "F ", 2))
-			ret_val = color(str, &m->f_col);
+			ret_val = color(str, &m->f_col, m);
 		else if (!ft_strncmp(str, "C ", 2))
-			ret_val = color(str, &m->c_col);
+			ret_val = color(str, &m->c_col, m);
 		else if (!ft_strncmp(str, "NO ", 3))
 			ret_val = texture(str, &m->tex[0], "NO", m);
 		else if (!ft_strncmp(str, "SO ", 3))
@@ -73,7 +74,7 @@ int	color_or_texture(int fd, t_map *m)
 	return (ret_val);
 }
 
-void	save_map(int fd, t_map *m)
+int	save_map(int fd, t_map *m)
 {
 	char	*line;
 	char	*one;
@@ -82,19 +83,26 @@ void	save_map(int fd, t_map *m)
 	m->whole_map = ft_strjoin("", line);
 	while (line)
 	{
+		free(line);
+		line = get_next_line(fd);
+		if (!line)
+			break ;
 		one = m->whole_map;
 		m->whole_map = ft_strjoin(one, line);
 		free(one);
-		free(line);
-		line = get_next_line(fd);
 	}
+	return (check_map(m->whole_map));
 }
 
 int	get_map(int fd, t_map *m)
 {
 	char	**s;
 
-	save_map(fd, m);
+	if (save_map(fd, m))
+	{
+		ft_printf("invalid map char\n");
+		return (1);
+	}
 	s = get_dimensions(m);
 	fill_map(s, m);
 	if (check_bounds(m->dir, m))
@@ -104,9 +112,8 @@ int	get_map(int fd, t_map *m)
 	}
 	if (get_player_pos(m))
 	{
-		ft_printf("only 1 player allowed\n");
+		ft_printf("exactly 1 player allowed\n");
 		return (1);
 	}
-	printf("x: %f y: %f", m->player->pos.x, m->player->pos.y);
 	return (0);
 }

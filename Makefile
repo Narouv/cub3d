@@ -6,11 +6,11 @@
 #    By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/19 17:59:41 by rnauke            #+#    #+#              #
-#    Updated: 2023/10/21 17:10:20 by rnauke           ###   ########.fr        #
+#    Updated: 2023/10/21 18:18:49 by rnauke           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = cub3d
+NAME = cub3D
 
 LIBFT_DIR = libft/
 LIBFT = $(LIBFT_DIR)libft.a
@@ -28,7 +28,7 @@ OBJECTS = $(SOURCES:.c=.o)
 DIR_SRC = $(addprefix $(SOURCES_DIR)/, $(SOURCES))
 DIR_OBJ = $(addprefix $(OBJECTS_DIR)/, $(OBJECTS))
 
-FLAGS = -Wall -Werror -Wextra -g3 -fsanitize=address
+FLAGS = -Wall -Werror -Wextra -g3 #-fsanitize=address
 # INCLUDES = -Iinclude -lglfw -L"/Users/$(USER)/.brew/opt/glfw/lib/"
 INCLUDES = -Iinclude -lglfw -L\"/opt/homebrew/Cellar/glfw/3.3.8/lib/\"
 ARGS = $(LIBFT) $(MLX42) $(INCLUDES) $(FLAGS)

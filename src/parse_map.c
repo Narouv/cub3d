@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/21 16:55:53 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 16:59:00 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 18:52:38 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ int	get_player_pos(t_map *m)
 			}
 		}
 	}
-	if (m->p_count > 1)
+	if (m->p_count != 1)
 		return (1);
 	return (0);
 }
@@ -128,4 +128,5 @@ void	fill_map(char **s, t_map *m)
 		m->dir[i][j] = '\0';
 		i++;
 	}
+	free_string(s);
 }

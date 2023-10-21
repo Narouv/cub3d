@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/21 16:55:53 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 17:06:35 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 19:29:47 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,11 @@ char	*skip_empty_lines(int fd, t_map *m)
 
 int	diagnose(t_map *m)
 {
+	if (m->tex_count > 4 || m->col_count > 2)
+	{
+		ft_printf("double keys\n");
+		return (1);
+	}
 	if (!m->tex[0] || !m->tex[1] || !m->tex[2] || !m->tex[3])
 	{
 		printf("missing texture\n");

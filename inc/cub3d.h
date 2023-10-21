@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 01:00:44 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 17:20:34 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 19:31:21 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ typedef struct s_map
 	char		*whole_map;
 	int			line_count;
 	int			tex_count;
+	int			col_count;
 	int			p_count;
 	char		**tex;
 	int			f_col;
@@ -123,8 +124,9 @@ int		parser(t_map *m, char *file);
 // parse_color.c
 int		rgb_con(char *r, char *g, char *b);
 int		check_split(char **split);
-int		color(char *color_str, int *color);
+int		color(char *color_str, int *color, t_map *m);
 int		valid_char(char c);
+int		check_map(char *m);
 
 // parse_map.c
 int		space_check(char **s, t_map *m, size_t i, size_t j);
@@ -144,7 +146,7 @@ int		diagnose(t_map *m);
 int		texture(char *tex_str, char **tex_path, char *symbol, t_map *m);
 int		check_struct(char *line, char *str);
 int		color_or_texture(int fd, t_map *m);
-void	save_map(int fd, t_map *m);
+int		save_map(int fd, t_map *m);
 int		get_map(int fd, t_map *m);
 
 // ray.c
@@ -157,5 +159,6 @@ void	cast_rays(t_mlxinfo *game);
 int		*get_pixel_data(char *img_path);
 void	clear_screen(void *param);
 void	free_string(char **str);
+void	cleanup(t_mlxinfo *game);
 
 #endif

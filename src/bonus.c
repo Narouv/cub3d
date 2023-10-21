@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/15 18:01:11 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 17:18:38 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 17:38:13 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,8 @@ void	minimap(t_mlxinfo *game)
 				put_square(game, x * 5, y * 5, 0xFFFFFFFF);
 			else if (game->map->dir[y][x] == '0')
 			{
-				if (x == game->player.pos.x && y == game->player.pos.y)
+				if (x == (int)game->player.pos.x
+					&& y == (int)game->player.pos.y)
 					put_square(game, x * 5, y * 5, 0x0000FFFF);
 				else
 					put_square(game, x * 5, y * 5, 0xCCCCCCFF);

@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/21 16:45:51 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 16:49:49 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 18:00:54 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,13 +80,13 @@ void	calc_pixel_column(t_mlxinfo *game, int x, t_texture *texture)
 
 int	get_texture_side(t_ray *ray)
 {
-	if (ray->side == 0 && ray->step_dir.x < 0)
-		return (0);
-	if (ray->side == 0 && ray->step_dir.x > 0)
-		return (1);
 	if (ray->side == 1 && ray->step_dir.y < 0)
-		return (2);
+		return (0);
 	if (ray->side == 1 && ray->step_dir.y > 0)
+		return (1);
+	if (ray->side == 0 && ray->step_dir.x < 0)
+		return (2);
+	if (ray->side == 0 && ray->step_dir.x > 0)
 		return (3);
 	return (0);
 }

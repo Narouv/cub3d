@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/21 16:45:51 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 17:19:40 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 18:27:47 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,28 +17,28 @@ int	*get_pixel_data(char *img_path)
 {
 	int				*txt_arr;
 	uint8_t			p;
-	size_t			tx;
-	size_t			ty;
+	t_veci			i;
 	mlx_texture_t	*t;
 
 	t = mlx_load_png(img_path);
 	p = t->bytes_per_pixel;
-	ty = 0;
+	i.y = 0;
 	txt_arr = malloc(sizeof(int) * TEX_HEIGHT * TEX_WIDTH);
-	while (ty < TEX_WIDTH)
+	while (i.y < TEX_WIDTH)
 	{
-		tx = 0;
-		while (tx < TEX_WIDTH)
+		i.x = 0;
+		while (i.x < TEX_WIDTH)
 		{
-			txt_arr[TEX_WIDTH * ty + tx]
-				= t->pixels[TEX_WIDTH * tx * p + ty * p] << 24
-				| t->pixels[TEX_WIDTH * tx * p + ty * p + 1] << 16
-				| t->pixels[TEX_WIDTH * tx * p + ty * p + 2] << 8
-				| t->pixels[TEX_WIDTH * tx * p + ty * p + 3];
-			tx++;
+			txt_arr[TEX_WIDTH * i.y + i.x]
+				= t->pixels[TEX_WIDTH * i.x * p + i.y * p] << 24
+				| t->pixels[TEX_WIDTH * i.x * p + i.y * p + 1] << 16
+				| t->pixels[TEX_WIDTH * i.x * p + i.y * p + 2] << 8
+				| t->pixels[TEX_WIDTH * i.x * p + i.y * p + 3];
+			i.x++;
 		}
-		ty++;
+		i.y++;
 	}
+	mlx_delete_texture(t);
 	return (txt_arr);
 }
 

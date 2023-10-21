@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/21 16:55:53 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 17:21:10 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 19:31:12 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ int	check_split(char **split)
 	return (0);
 }
 
-int	color(char *color_str, int *color)
+int	color(char *color_str, int *color, t_map *m)
 {
 	char	*str;
 	char	**split;
@@ -61,6 +61,7 @@ int	color(char *color_str, int *color)
 	{
 		free(str);
 		free_string(split);
+		ft_printf("invalid color\n");
 		return (1);
 	}
 	*color = rgb_con(split[0], split[1], split[2]);
@@ -68,6 +69,7 @@ int	color(char *color_str, int *color)
 	free_string(split);
 	if (*color == 1)
 		return (1);
+	m->col_count++;
 	return (0);
 }
 
@@ -77,6 +79,23 @@ int	valid_char(char c)
 	if (c == '0' || c == 'N' || c == 'S' || c == 'E' || c == 'W' )
 	{
 		return (1);
+	}
+	return (0);
+}
+
+// map util
+int	check_map(char *m)
+{
+	size_t	cntr;
+
+	cntr = 0;
+	while (m[cntr])
+	{
+		if (m[cntr] != ' ' && m[cntr] != '0' && m[cntr] != '1'
+			&& m[cntr] != 'N' && m[cntr] != 'S' && m[cntr] != 'W'
+			&& m[cntr] != 'E' && m[cntr] != '\n')
+			return (1);
+		cntr++;
 	}
 	return (0);
 }

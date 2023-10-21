@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 00:58:05 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 17:14:14 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 18:27:38 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ static void	init_all(t_mlxinfo *game)
 {
 	init_game(game);
 	init_map(game->map, &game->player);
-	init_player(&game->player);
 	init_ray(&game->ray);
 }
 
@@ -61,12 +60,11 @@ int	main(int argc, char **argv)
 	mlx = game->mlx;
 	game->img = mlx_new_image(mlx, WIDTH, HEIGHT);
 	init_textures(game);
+	init_player(&game->player);
 	mlx_image_to_window(mlx, game->img, 0, 0);
 	mlx_loop_hook(mlx, ft_controls, game);
 	mlx_cursor_hook(mlx, (mlx_cursorfunc)mouse_rot, game);
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
-	// cleanup(game);
-	// system("leaks cub3d");
 	return (0);
 }
