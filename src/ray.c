@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ray.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/17 16:59:35 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 13:55:58 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 17:09:25 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,5 +75,26 @@ void	ray_direction(t_ray *ray, t_player *player)
 		ray->step_dir.y = 1;
 		ray->side_dist.y
 			= (ray->map_pos.y + 1.0 - player->pos.y) * ray->delta_dist.y;
+	}
+}
+
+void	cast_rays(t_mlxinfo *game)
+{
+	size_t		x;
+	double		camera;
+	t_player	*player;
+	t_ray		*ray;
+
+	x = 0;
+	player = &game->player;
+	ray = &game->ray;
+	while (x < WIDTH)
+	{
+		camera = 2 * x / (double)WIDTH - 1;
+		update_ray(ray, player, camera);
+		ray_direction(ray, player);
+		ray_length(ray, game->map);
+		calc_pixel_column(game, x, &game->texture[get_texture_side(ray)]);
+		x++;
 	}
 }

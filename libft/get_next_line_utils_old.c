@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line_utils_old.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/10 15:53:27 by rnauke            #+#    #+#             */
-/*   Updated: 2023/03/21 19:03:26 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 17:20:51 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ char	*ft_check_line(char *line, char *l_buf)
 	if (*line)
 	{
 		while (*(line + cntr))
-		{	
+		{
 			if (*(line + cntr) == '\n')
 			{
 				cntr++;

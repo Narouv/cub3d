@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   control.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/17 17:01:07 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 14:50:08 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 16:28:38 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,41 +42,6 @@ void	move_player(t_mlxinfo *game, t_vec axis, double val)
 		p->pos.x += axis.x * move_speed;
 	if (m->dir[(int)(p->pos.y + (axis.y * move_speed))][(int)p->pos.x] == '0')
 		p->pos.y += axis.y * move_speed;
-}
-
-void	put_square(mlx_image_t *img, int x, int y, int color)
-{
-	int	scale = 10; // replace with some sort of scale in the struct
-	for (int xs = 0; xs < scale; xs++)
-		for (int ys = 0; ys < scale; ys++)
-			if (!xs || !ys)
-				mlx_put_pixel(img, x+xs, y+ys, 0x000000FF);
-			else if (xs == scale -1 || ys == scale -1)
-				mlx_put_pixel(img, x+xs, y+ys, 0x000000FF);
-			else
-				mlx_put_pixel(img, x+xs, y+ys, color);
-}
-
-void minimap(t_mlxinfo *game)
-{
-	int scale = 10; // replace with some sort of scale in the struct
-	for (size_t y = 0; y < game->map->height; y++)
-	{
-		for (size_t x = 0; x < game->map->width; x++)
-		{
-			if (game->map->dir[y][x] == '1')
-				put_square(game->img, x*scale, y*scale, 0xFFFFFFFF);
-			else if (game->map->dir[y][x] == '0')
-			{
-				if (x == (size_t)game->player.pos.x && y == (size_t)game->player.pos.y)
-					put_square(game->img, x*scale, y*scale, 0xCC0000FF);
-				else
-					put_square(game->img, x*scale, y*scale, 0xCCCCCCFF);
-			}
-			else
-				put_square(game->img, x*scale, y*scale, 0x0);
-		}	
-	}
 }
 
 void	ft_controls(void *g)

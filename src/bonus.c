@@ -3,80 +3,66 @@
 /*                                                        :::      ::::::::   */
 /*   bonus.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/15 18:01:11 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 14:45:42 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 17:18:38 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/cub3d_bonus.h"
+#include "../inc/cub3d.h"
 
-// void	put_square(mlx_image_t *img, int x, int y, int color)
-// {
-// 	int scale = 10; // replace with some sort of scale in the struct
-// 	for (int xs = 0; xs < scale; xs++)
-// 		for (int ys = 0; ys < scale; ys++)
-// 			if (!xs || !ys)
-// 				mlx_put_pixel(img, x+xs, y+ys, 0x000000FF);
-// 			else if (xs == scale -1 || ys == scale -1)
-// 				mlx_put_pixel(img, x+xs, y+ys, 0x000000FF);
-// 			else
-// 				mlx_put_pixel(img, x+xs, y+ys, color);
-// }
-
-// void minimap(void *i/*, char **map*/)
-// {
-// 	mlx_image_t *img = i;
-// 	int scale = 10; // replace with some sort of scale in the struct
-// 	for (int y = 0; y < MAP_HEIGHT; y++)
-// 	{
-// 		for (int x = 0; x < MAP_WIDTH; x++)
-// 		{
-// 			if (map[y][x] == '1')
-// 				put_square(img, x*scale, y*scale, 0xFFFFFFFF);
-// 			else if (map[y][x] == '0')
-// 				put_square(img, x*scale, y*scale, 0xCCCCCCFF);
-// 			else
-// 				put_square(img, x*scale, y*scale, 0x0);
-// 		}	
-// 	}
-// }
-
-void	check_door(t_ray *ray)
+void	put_square(t_mlxinfo *game, int x, int y, int color)
 {
-	int	hit;
+	int	xs;
+	int	ys;
+	int	scale;
 
-	hit = 0;
-	while (!hit)
+	scale = 5;
+	xs = 0;
+	while (xs < scale)
 	{
-		if (ray->side_dist.x < ray->side_dist.y)
+		ys = 0;
+		while (ys < scale)
 		{
-			ray->side_dist.x += ray->delta_dist.x;
-			ray->map_pos.x += ray->step_dir.x;
-			ray->side = 0;
+			if (!xs || !ys)
+				mlx_put_pixel(game->img, x + xs, y + ys, 0x000000FF);
+			else if (xs == scale -1 || ys == scale -1)
+				mlx_put_pixel(game->img, x + xs, y + ys, 0x000000FF);
+			else
+				mlx_put_pixel(game->img, x + xs, y + ys, color);
+			ys++;
 		}
-		else
-		{
-			ray->side_dist.y += ray->delta_dist.y;
-			ray->map_pos.y += ray->step_dir.y;
-			ray->side = 1;
-		}
-		if (map[ray->map_pos.x][ray->map_pos.y] == '2')
-		{
-			ray->door = 1;
-			hit = 1;
-		}
-		else if (map[ray->map_pos.x][ray->map_pos.y] == '1')
-		{
-			ray->door = 0;
-			hit = 1;
-		}
+		xs++;
 	}
-	if (!ray->side)
-		ray->length = (ray->side_dist.x - ray->delta_dist.x);
-	else
-		ray->length = (ray->side_dist.y - ray->delta_dist.y);
+}
+
+void	minimap(t_mlxinfo *game)
+{
+	int	y;
+	int	x;
+
+	y = 0;
+	while (y < (int)game->map->height)
+	{
+		x = 0;
+		while (x < (int)game->map->width)
+		{
+			if (game->map->dir[y][x] == '1')
+				put_square(game, x * 5, y * 5, 0xFFFFFFFF);
+			else if (game->map->dir[y][x] == '0')
+			{
+				if (x == game->player.pos.x && y == game->player.pos.y)
+					put_square(game, x * 5, y * 5, 0x0000FFFF);
+				else
+					put_square(game, x * 5, y * 5, 0xCCCCCCFF);
+			}
+			else
+				put_square(game, x * 5, y * 5, 0x0);
+			x++;
+		}
+		y++;
+	}
 }
 
 void	mouse_rot(void *g)
@@ -90,32 +76,3 @@ void	mouse_rot(void *g)
 	rot_fov(game, -((((double)x - ((double)WIDTH / 2))) * 0.1));
 	mlx_set_mouse_pos(game->mlx, WIDTH / 2, HEIGHT / 2);
 }
-
-void	move_player(t_mlxinfo *game, t_vec axis, double val)
-{
-	double	move_speed;
-
-	move_speed = (game->time - game->old_time) * val;
-	game->player.pos.x += axis.x * move_speed;
-	game->player.pos.y += axis.y * move_speed;
-}
-
-void	toggle_door(t_mlxinfo *game)
-{
-	double	l;
-	int		x;
-	double	camera;
-
-	x = WIDTH / 2;
-	camera = 2 * x / (double)WIDTH - 1;
-	update_ray(&game->ray, &game->player, camera);
-	ray_direction(&game->ray, &game->player);
-	l = check_door(&game->ray);
-	if (game->ray.door)
-		map[game->ray.map_pos.x][game->ray.map_pos.y] = '1';
-	else
-		map[game->ray.map_pos.x][game->ray.map_pos.y] = '2';
-}
-
-// cursor_hook
-// mlx_cursor_hook(mlx, (mlx_cursorfunc)mouse_rot, game);

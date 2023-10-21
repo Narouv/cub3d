@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+         #
+#    By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/19 17:59:41 by rnauke            #+#    #+#              #
-#    Updated: 2023/10/21 14:14:36 by rnauke           ###   ########.fr        #
+#    Updated: 2023/10/21 17:10:20 by rnauke           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ SOURCES_DIR = src
 
 user = "$USER"
 
-SOURCES = main.c ray.c control.c parser.c
+SOURCES = bonus.c control.c draw.c init.c main.c parse_color.c parse_map.c parse_util.c parser.c ray.c util.c
 OBJECTS = $(SOURCES:.c=.o)
 
 DIR_SRC = $(addprefix $(SOURCES_DIR)/, $(SOURCES))

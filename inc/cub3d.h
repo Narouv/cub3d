@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 01:00:44 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 12:51:11 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 17:20:34 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@
 # include <stdio.h>
 # include <math.h>
 # include <fcntl.h>
-# define WIDTH 640
-# define HEIGHT 480
+# define WIDTH 1440
+# define HEIGHT 810
 # define TEX_WIDTH 256
 # define TEX_HEIGHT 256
 
@@ -47,8 +47,8 @@ typedef struct s_player
 
 typedef struct s_map
 {
-	size_t			width;
-	size_t			height;
+	size_t		width;
+	size_t		height;
 	char		**dir;
 	t_player	*player;
 	char		*whole_map;
@@ -84,7 +84,7 @@ typedef struct s_ray
 typedef struct s_mlxinfo
 {
 	mlx_t		*mlx;
-	mlx_image_t *img;
+	mlx_image_t	*img;
 	t_player	player;
 	t_ray		ray;
 	t_texture	*texture;
@@ -94,17 +94,68 @@ typedef struct s_mlxinfo
 	double		old_time;
 }	t_mlxinfo;
 
-void	cast_rays(t_mlxinfo *game);
-void	clear_screen(void *param);
+// bonus.c
+void	mouse_rot(void *g);
+void	minimap(t_mlxinfo *game);
+void	put_square(t_mlxinfo *game, int x, int y, int color);
 
+// control.c
 void	rot_fov(t_mlxinfo *game, double rot_val);
 void	move_player(t_mlxinfo *game, t_vec axis, double val);
 void	ft_controls(void *g);
 
+// draw.c
+t_veci	calc_wall_height(int *wall_height, double ray_len);
+void	draw_pixel_column(t_mlxinfo *game, int x, t_veci wall, t_texture t);
+void	calc_pixel_column(t_mlxinfo *game, int x, t_texture *texture);
+int		get_texture_side(t_ray *ray);
+
+// init.c
+void	init_player(t_player *player);
+void	init_ray(t_ray *ray);
+void	init_game(t_mlxinfo *game);
+void	init_textures(t_mlxinfo *game);
+void	init_map(t_map *map, t_player *player);
+
+// main.c
+int		parser(t_map *m, char *file);
+
+// parse_color.c
+int		rgb_con(char *r, char *g, char *b);
+int		check_split(char **split);
+int		color(char *color_str, int *color);
+int		valid_char(char c);
+
+// parse_map.c
+int		space_check(char **s, t_map *m, size_t i, size_t j);
+int		check_bounds(char **s, t_map *m);
+char	**get_dimensions(t_map *m);
+int		get_player_pos(t_map *m);
+void	fill_map(char **s, t_map *m);
+
+// parse_util.c
+int		filename_error(char *file, char *c);
+int		read_check(char *file);
+int		file_check(char *file);
+char	*skip_empty_lines(int fd, t_map *m);
+int		diagnose(t_map *m);
+
+// parser.c
+int		texture(char *tex_str, char **tex_path, char *symbol, t_map *m);
+int		check_struct(char *line, char *str);
+int		color_or_texture(int fd, t_map *m);
+void	save_map(int fd, t_map *m);
+int		get_map(int fd, t_map *m);
+
+// ray.c
 void	update_ray(t_ray *ray, t_player *player, double camera);
 void	ray_length(t_ray *ray, t_map *map);
 void	ray_direction(t_ray *ray, t_player *player);
+void	cast_rays(t_mlxinfo *game);
 
-int	parser(t_map *m, char *file);
+// util.c
+int		*get_pixel_data(char *img_path);
+void	clear_screen(void *param);
+void	free_string(char **str);
 
 #endif
