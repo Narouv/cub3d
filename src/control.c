@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/17 17:01:07 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 13:37:36 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 14:43:17 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,17 +32,21 @@ void	rot_fov(t_mlxinfo *game, double rot_val)
 void	move_player(t_mlxinfo *game, t_vec axis, double val)
 {
 	double		move_speed;
+	t_player	p;
+	t_map		*m;
 
+	p = game->player;
+	m = game->map;
 	move_speed = (game->time - game->old_time) * val;
-	if(game->map->dir[(int)game->player.pos.y][(int)(game->player.pos.x + (axis.x * move_speed))] == '0')
-		game->player.pos.x += axis.x * move_speed;
-	if(game->map->dir[(int)(game->player.pos.y + (axis.y * move_speed))][(int)game->player.pos.x] == '0')
-		game->player.pos.y += axis.y * move_speed;
+	if (m->dir[(int)p.pos.y][(int)(p.pos.x + (axis.x * move_speed))] == '0')
+		p.pos.x += axis.x * move_speed;
+	if (m->dir[(int)(p.pos.y + (axis.y * move_speed))][(int)p.pos.x] == '0')
+		p.pos.y += axis.y * move_speed;
 }
 
 void	put_square(mlx_image_t *img, int x, int y, int color)
 {
-	int scale = 10; // replace with some sort of scale in the struct
+	int	scale = 10; // replace with some sort of scale in the struct
 	for (int xs = 0; xs < scale; xs++)
 		for (int ys = 0; ys < scale; ys++)
 			if (!xs || !ys)

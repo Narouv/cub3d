@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 00:58:05 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 12:53:44 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 14:40:25 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,10 +107,10 @@ t_veci	calc_wall_height(int *wall_height, double ray_len)
 	wall.y = (*wall_height / 2) + (HEIGHT / 2);
 	if (wall.y >= HEIGHT)
 		wall.y = HEIGHT - 1;
-	return wall;
+	return (wall);
 }
 
-void	draw_pixel_column(mlx_image_t *img, int x, t_veci wall, t_texture texture)
+void	draw_pixel_column(t_mlxinfo *game, int x, t_veci wall, t_texture t)
 {
 	int	y;
 
@@ -118,16 +118,16 @@ void	draw_pixel_column(mlx_image_t *img, int x, t_veci wall, t_texture texture)
 	while (y < HEIGHT)
 	{
 		if (y < wall.x)
-			mlx_put_pixel(img, x, y, 0x520575FF);
+			mlx_put_pixel(game->img, x, y, game->map->c_col);
 		else if (y >= wall.x && y < wall.y)
 		{
-			texture.color
-				= texture.pixels[(TEX_HEIGHT * texture.x + (int)texture.y)];
-			mlx_put_pixel(img, x, y, texture.color);
-			texture.y += texture.tex_step;
+			t.color
+				= t.pixels[(TEX_HEIGHT * t.x + (int)t.y)];
+			mlx_put_pixel(game->img, x, y, t.color);
+			t.y += t.tex_step;
 		}
 		else
-			mlx_put_pixel(img, x, y, 0x32a852FF);
+			mlx_put_pixel(game->img, x, y, game->map->f_col);
 		y++;
 	}
 }
@@ -158,7 +158,7 @@ void	calc_pixel_column(t_mlxinfo *game, int x, t_texture *texture)
 		= ((double)wall.x - (double)HEIGHT
 			/ 2 + (double)texture->wall_height / 2)
 		* texture->tex_step;
-	draw_pixel_column(game->img, x, wall, *texture);
+	draw_pixel_column(game, x, wall, *texture);
 }
 
 int	get_texture_side(t_ray *ray)
@@ -244,9 +244,10 @@ int	main(int argc, char **argv)
 {
 	t_mlxinfo	*game;
 	mlx_t		*mlx;
-	char *map_file;
+	char		*map_file;
 
-	if (argc != 2) {
+	if (argc != 2)
+	{
 		printf("Usage: %s <map_file>\n", argv[0]);
 		return (1);
 	}
@@ -256,12 +257,10 @@ int	main(int argc, char **argv)
 	init_map(game->map, &game->player);
 	init_player(&game->player);
 	init_ray(&game->ray);
-	if (parser(game->map, map_file) == 0) {
+	if (!parser(game->map, map_file))
 		printf("Map parsing successful!\n");
-	} else {
-		printf("Map parsing failed!\n");
+	else
 		return (0);
-	}
 	game->mlx = mlx_init(WIDTH, HEIGHT, "cub3d", true);
 	mlx = game->mlx;
 	game->img = mlx_new_image(mlx, WIDTH, HEIGHT);
@@ -271,6 +270,6 @@ int	main(int argc, char **argv)
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
 	// cleanup(game);
-	system("leaks cub3d");
+	// system("leaks cub3d");
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/13 13:15:57 by rhortens          #+#    #+#             */
-/*   Updated: 2023/10/21 13:02:31 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/21 14:37:36 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,11 +243,11 @@ int	space_check(char **s, t_map *m, size_t i, size_t j)
 {
 	if (i && j && valid_char(s[i][j]))
 	{
-		if (j < ft_strlen(s[i])	&& (s[i][j + 1] == ' '
+		if (j < ft_strlen(s[i]) && (s[i][j + 1] == ' '
 			|| s[i][j - 1] == ' '))
-			return (1); //printf("end line\n");
+			return (1);
 		if (i < m->height - 1 && (s[i + 1][j] == ' ' || s[i - 1][j] == ' '))
-			return (1); //printf("end line\n");
+			return (1);
 	}
 	return (0);
 }
@@ -256,7 +256,7 @@ int	check_bounds(char **s, t_map *m)
 {
 	size_t	i;
 	size_t	j;
-	
+
 	i = 0;
 	while (i < m->height)
 	{
@@ -264,13 +264,13 @@ int	check_bounds(char **s, t_map *m)
 		while (j < m->width)
 		{
 			if (!i && (s[i][j] != '1' && s[i][j] != ' '))
-				return (1); //printf("end line\n");
+				return (1);
 			else if (i == m->height - 1 && (s[i][j] != '1' && s[i][j] != ' '))
-				return (1); //printf("end line\n");
+				return (1);
 			else if (!j && (s[i][j] != '1' && s[i][j] != ' '))
-				return (1); //printf("end line\n");
+				return (1);
 			else if (!s[i][j] && ft_strlen(s[i]) > j && s[i][j - 1] != '1')
-				return (1); //printf("end line\n");
+				return (1);
 			else if (space_check(s, m, i, j))
 				return (1);
 			j++;
@@ -359,7 +359,7 @@ void	fill_map(char **s, t_map *m)
 
 int	get_map(int fd, t_map *m)
 {
-	char **s;
+	char	**s;
 
 	save_map(fd, m);
 	s = get_dimensions(m);
@@ -389,7 +389,7 @@ int	diagnose(t_map *m)
 	{
 		printf("missing floor color\n");
 		return (1);
-	}	
+	}
 	if (!m->c_col)
 	{
 		printf("missing ceiling color\n");
