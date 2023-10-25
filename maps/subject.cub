@@ -1,7 +1,7 @@
-NO ./assets/mc_cave.png
-SO ./assets/mc_house.png
-WE ./assets/mc_desert.png
-EA ./assets/mc_nether.png
+NO /Users/rouven/Documents/GitHub/cub3d/assets/mc_cave.png
+SO /Users/rouven/Documents/GitHub/cub3d/assets/mc_house.png
+WE /Users/rouven/Documents/GitHub/cub3d/assets/mc_desert.png
+EA /Users/rouven/Documents/GitHub/cub3d/assets/mc_nether.png
 
 F 148,54,0
 C 0,132,252
@@ -16,7 +16,7 @@ C 0,132,252
 11110111111111011101010010001
 11000000110101011100000010001
 10000000000000001100000010001
-1000E0000000000011010100100011
+1000N0000000000011010100100011
 11000001110101011111011110001
 11110111 1110101 101111010001
 11111111 1111111 111111111111

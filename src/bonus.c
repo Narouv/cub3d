@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/15 18:01:11 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/25 02:03:30 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/25 03:31:54 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,27 +42,27 @@ void	minimap(t_mlxinfo *game)
 	int	y;
 	int	x;
 
-	x = 0;
-	while (x < (int)game->map->width)
+	y = 0;
+	while (y < (int)game->map->height)
 	{
-		y = 0;
-		while (y < (int)game->map->height)
+		x = 0;
+		while (x < (int)game->map->width)
 		{
-			if (game->map->dir[x][y] == '1')
-				put_square(game, y * 5, x * 5, 0xFFFFFFFF);
-			else if (game->map->dir[x][y] == '0')
+			if (game->map->dir[y][x] == '1')
+				put_square(game, x * 5, y * 5, 0xFFFFFFFF);
+			else if (game->map->dir[y][x] == '0')
 			{
 				if (x == (int)game->player.pos.x
 					&& y == (int)game->player.pos.y)
-					put_square(game, y * 5, x * 5, 0x0000FFFF);
+					put_square(game, x * 5, y * 5, 0x0000FFFF);
 				else
-					put_square(game, y * 5, x * 5, 0xCCCCCCFF);
+					put_square(game, x * 5, y * 5, 0xCCCCCCFF);
 			}
 			else
-				put_square(game, y * 5, x * 5, 0x0);
-			y++;
+				put_square(game, x * 5, y * 5, 0x0);
+			x++;
 		}
-		x++;
+		y++;
 	}
 }
 

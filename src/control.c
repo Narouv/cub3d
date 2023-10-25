@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/17 17:01:07 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/25 01:42:12 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/25 03:35:14 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,9 @@ void	move_player(t_mlxinfo *game, t_vec axis, double val)
 	p = &game->player;
 	m = game->map;
 	move_speed = (game->time - game->old_time) * val;
-	if (m->dir[(int)(p->pos.x + (axis.x * move_speed))][(int)p->pos.y] == '0')
+	if (m->dir[(int)p->pos.y][(int)(p->pos.x + (axis.x * move_speed))] == '0')
 		p->pos.x += axis.x * move_speed;
-	if (m->dir[(int)p->pos.x][(int)(p->pos.y + (axis.y * move_speed))] == '0')
+	if (m->dir[(int)(p->pos.y + (axis.y * move_speed))][(int)p->pos.x] == '0')
 		p->pos.y += axis.y * move_speed;
 }
 

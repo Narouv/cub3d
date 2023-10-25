@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/17 16:59:35 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/25 02:17:16 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/25 03:36:17 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void	ray_length(t_ray *ray, t_map *map)
 			ray->map_pos.y += ray->step_dir.y;
 			ray->side = 1;
 		}
-		if (map->dir[ray->map_pos.x][ray->map_pos.y] == '1')
+		if (map->dir[ray->map_pos.y][ray->map_pos.x] == '1')
 			hit = 1;
 	}
 	if (!ray->side)
