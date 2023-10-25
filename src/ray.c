@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ray.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/17 16:59:35 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 17:09:25 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/25 02:17:16 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,11 @@ void	update_ray(t_ray *ray, t_player *player, double camera)
 	ray->angle.x = player->viewdir.x + player->plane.x * camera;
 	ray->angle.y = player->viewdir.y + player->plane.y * camera;
 	ray->delta_dist.x = fabs(1 / ray->angle.x);
+	if (ray->angle.x == 0)
+		ray->delta_dist.x = INFINITY;
 	ray->delta_dist.y = fabs(1 / ray->angle.y);
+	if (ray->angle.y == 0)
+		ray->delta_dist.y = INFINITY;
 	ray->map_pos.x = (int)player->pos.x;
 	ray->map_pos.y = (int)player->pos.y;
 }
@@ -41,7 +45,7 @@ void	ray_length(t_ray *ray, t_map *map)
 			ray->map_pos.y += ray->step_dir.y;
 			ray->side = 1;
 		}
-		if (map->dir[ray->map_pos.y][ray->map_pos.x] == '1')
+		if (map->dir[ray->map_pos.x][ray->map_pos.y] == '1')
 			hit = 1;
 	}
 	if (!ray->side)

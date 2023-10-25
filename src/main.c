@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 00:58:05 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 18:27:38 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/25 02:16:55 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,5 +66,6 @@ int	main(int argc, char **argv)
 	mlx_cursor_hook(mlx, (mlx_cursorfunc)mouse_rot, game);
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
+	cleanup(game);
 	return (0);
 }

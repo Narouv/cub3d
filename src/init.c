@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/21 16:51:14 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 19:18:34 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/25 02:00:21 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	init_player(t_player *player)
 	player->viewdir.y = 0;
 	player->plane.x = 0;
 	player->plane.y = 0;
-	if (player->stand == 'W')
+	if (player->stand == 'N')
 	{
 		player->viewdir.x = -1;
 		player->plane.y = 0.66;

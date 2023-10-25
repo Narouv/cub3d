@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/21 01:00:44 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 19:31:21 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/25 01:41:18 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@
 # include <stdio.h>
 # include <math.h>
 # include <fcntl.h>
-# define WIDTH 1440
-# define HEIGHT 810
+# define WIDTH 800
+# define HEIGHT 600
 # define TEX_WIDTH 256
 # define TEX_HEIGHT 256
 

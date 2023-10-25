@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   util.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/21 16:45:51 by rnauke            #+#    #+#             */
-/*   Updated: 2023/10/21 18:27:47 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/10/25 02:16:04 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,4 +72,25 @@ void	free_string(char **str)
 	while (str[i])
 		free(str[i++]);
 	free(str);
+}
+
+void	cleanup(t_mlxinfo *game)
+{
+	size_t	x;
+
+	free(game->map->tex[0]);
+	free(game->map->tex[1]);
+	free(game->map->tex[2]);
+	free(game->map->tex[3]);
+	free(game->map->tex);
+	free(game->map->whole_map);
+	free(game->texture[0].pixels);
+	free(game->texture[1].pixels);
+	free(game->texture[2].pixels);
+	free(game->texture[3].pixels);
+	free(game->texture);
+	x = 0;
+	while (x < game->map->height)
+		free(game->map->dir[x++]);
+	free(game->map->dir);
 }
