@@ -11,8 +11,8 @@ This project is inspired by the world-famous Wolfenstein 3D game, which was the 
 ## Installation
 ```sh
 # Clone the repository
-git clone https://github.com/your-username/project-name.git
-cd project-name
+git clone https://github.com/Narouv/cub3d.git
+cd cub3d
 
 # Build the project
 make
