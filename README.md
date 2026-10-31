@@ -86,12 +86,9 @@ The program must be given a valid map; invalid maps are rejected with a clear er
 
 ### References and documentation
 
-- [cub3D subject PDF (42)](https://cdn.intra.42.fr/pdf/pdf/129959/en.subject.pdf) — the official project assignment
 - [Lode Vandevenne — Raycasting tutorial](https://lodev.org/cgtutor/raycasting.html) — the classic step-by-step guide to raycasting, which the rendering engine is based on
 - [Permadi's Raycasting FAQ](https://permadi.com/1996/05/ray-casting-tutorial-fs/) — another foundational raycasting walkthrough
-- [Wolfenstein 3D (Wikipedia)](https://en.wikipedia.org/wiki/Wolfenstein_3D) — background on the game that inspired the project
 - [MLX42 documentation](https://codam-coding-college.github.io/MLX42/) — the graphics library used for windowing and pixel drawing
-- [GLFW documentation](https://www.glfw.org/documentation.html) — the windowing/input backend used by MLX42
 
 ### Use of AI
 
